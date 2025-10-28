@@ -9,6 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { SearchInput } from "@/components/search-input"
 
 const data = [
   { id: "BT-001", date: "Oct 28, 2025", boatName: "Sea Explorer", operator: "Blue Wave Co.", tourists: 8, foreign: 6, purpose: "Leisure" },
@@ -22,13 +23,33 @@ const data = [
 ]
 
 export function DataTable() {
+  const [searchQuery, setSearchQuery] = React.useState("")
+
+  const filteredData = data.filter((row) => {
+    const searchLower = searchQuery.toLowerCase()
+    return (
+      row.id.toLowerCase().includes(searchLower) ||
+      row.boatName.toLowerCase().includes(searchLower) ||
+      row.operator.toLowerCase().includes(searchLower) ||
+      row.purpose.toLowerCase().includes(searchLower) ||
+      row.date.toLowerCase().includes(searchLower)
+    )
+  })
+
   return (
     <div className="w-full">
-      <div className="pb-4">
-        <h3 className="text-lg font-semibold">Recent Boat Transactions</h3>
-        <p className="text-sm text-muted-foreground">
-          Latest boat trips and tourist entries recorded in the system.
-        </p>
+      <div className="pb-4 flex items-center justify-between">
+        <div>
+          <h3 className="text-lg font-semibold">Recent Boat Transactions</h3>
+          <p className="text-sm text-muted-foreground">
+            Latest boat trips and tourist entries recorded in the system.
+          </p>
+        </div>
+        <SearchInput 
+          className="w-[300px]" 
+          onSearch={setSearchQuery}
+          placeholder="Search trips..."
+        />
       </div>
       <div className="rounded-md border">
         <Table>
@@ -44,7 +65,14 @@ export function DataTable() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {data.map((row) => (
+            {filteredData.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
+                  No results found for "{searchQuery}"
+                </TableCell>
+              </TableRow>
+            ) : (
+              filteredData.map((row) => (
               <TableRow key={row.id}>
                 <TableCell className="font-medium">{row.id}</TableCell>
                 <TableCell>{row.date}</TableCell>
@@ -68,7 +96,8 @@ export function DataTable() {
                   </span>
                 </TableCell>
               </TableRow>
-            ))}
+              ))
+            )}
           </TableBody>
         </Table>
       </div>

@@ -1,7 +1,7 @@
 "use client"
 
 import { TrendingUp } from "lucide-react"
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts"
+import { Bar, BarChart, CartesianGrid, LabelList, XAxis, YAxis } from "recharts"
 
 import {
   Card,
@@ -46,14 +46,14 @@ export function AccommodationTypeChart() {
   const totalVisitors = chartData.reduce((acc, curr) => acc + curr.visitors, 0)
 
   return (
-    <Card>
+    <Card className="flex flex-col h-full min-h-[500px]">
       <CardHeader>
         <CardTitle>Accommodation Type</CardTitle>
         <CardDescription>Tourist accommodation preferences</CardDescription>
       </CardHeader>
-      <CardContent>
-        <ChartContainer config={chartConfig}>
-          <BarChart accessibilityLayer data={chartData}>
+      <CardContent className="flex-1">
+        <ChartContainer config={chartConfig} className="h-full w-full min-h-[300px] aspect-auto">
+          <BarChart accessibilityLayer data={chartData} width={undefined} height={undefined}>
             <CartesianGrid vertical={false} />
             <XAxis
               dataKey="type"
@@ -75,7 +75,14 @@ export function AccommodationTypeChart() {
               dataKey="visitors"
               radius={8}
               fill="var(--color-visitors)"
-            />
+            >
+              <LabelList
+                dataKey="visitors"
+                position="top"
+                className="fill-foreground"
+                fontSize={12}
+              />
+            </Bar>
           </BarChart>
         </ChartContainer>
       </CardContent>

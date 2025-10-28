@@ -1,7 +1,7 @@
 "use client"
 
 import { TrendingUp } from "lucide-react"
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts"
+import { Bar, BarChart, CartesianGrid, LabelList, XAxis, YAxis } from "recharts"
 
 import {
   Card,
@@ -40,14 +40,14 @@ const chartConfig = {
 
 export function TouristNationalityChart() {
   return (
-    <Card>
+    <Card className="flex flex-col h-full min-h-[500px]">
       <CardHeader>
         <CardTitle>Tourist by Nationality</CardTitle>
         <CardDescription>Foreign vs Domestic breakdown</CardDescription>
       </CardHeader>
-      <CardContent>
-        <ChartContainer config={chartConfig}>
-          <BarChart accessibilityLayer data={chartData}>
+      <CardContent className="flex-1">
+        <ChartContainer config={chartConfig} className="h-full w-full min-h-[300px] aspect-auto">
+          <BarChart accessibilityLayer data={chartData} width={undefined} height={undefined}>
             <CartesianGrid vertical={false} />
             <XAxis
               dataKey="nationality"
@@ -65,8 +65,22 @@ export function TouristNationalityChart() {
               cursor={false}
               content={<ChartTooltipContent indicator="dashed" />}
             />
-            <Bar dataKey="foreign" fill="var(--color-foreign)" radius={4} />
-            <Bar dataKey="domestic" fill="var(--color-domestic)" radius={4} />
+            <Bar dataKey="foreign" fill="var(--color-foreign)" radius={4}>
+              <LabelList
+                dataKey="foreign"
+                position="top"
+                className="fill-foreground"
+                fontSize={10}
+              />
+            </Bar>
+            <Bar dataKey="domestic" fill="var(--color-domestic)" radius={4}>
+              <LabelList
+                dataKey="domestic"
+                position="top"
+                className="fill-foreground"
+                fontSize={10}
+              />
+            </Bar>
           </BarChart>
         </ChartContainer>
       </CardContent>

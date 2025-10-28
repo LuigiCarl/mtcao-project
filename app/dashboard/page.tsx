@@ -7,6 +7,7 @@ import { PurposeOfVisitChart } from "@/components/purpose-of-visit-chart"
 import { BoatTripTrendChart } from "@/components/boat-trip-trend-chart"
 import { AccommodationTypeChart } from "@/components/accommodation-type-chart"
 import { TouristSpotChart } from "@/components/tourist-spot-chart"
+import { ExportableChart } from "@/components/exportable-chart"
 import { ModeToggle } from "@/components/mode-toggle"
 import {
   Breadcrumb,
@@ -180,15 +181,25 @@ export default function Page() {
           </div>
 
           {/* Charts Grid - 2x2 plus 1 full width */}
-          <div className="grid gap-4 md:grid-cols-2">
-            <TouristNationalityChart />
-            <PurposeOfVisitChart />
-            <AccommodationTypeChart />
-            <BoatTripTrendChart />
+          <div className="grid gap-4 md:grid-cols-2 auto-rows-fr">
+            <ExportableChart chartId="nationality-chart" chartName="Tourist_Nationality">
+              <TouristNationalityChart />
+            </ExportableChart>
+            <ExportableChart chartId="purpose-chart" chartName="Purpose_of_Visit">
+              <PurposeOfVisitChart />
+            </ExportableChart>
+            <ExportableChart chartId="accommodation-chart" chartName="Accommodation_Type">
+              <AccommodationTypeChart />
+            </ExportableChart>
+            <ExportableChart chartId="boat-trend-chart" chartName="Boat_Trip_Trends">
+              <BoatTripTrendChart />
+            </ExportableChart>
           </div>
 
           {/* Additional Chart - Full Width */}
-          <TouristSpotChart />
+          <ExportableChart chartId="tourist-spot-chart" chartName="Tourist_Spots">
+            <TouristSpotChart />
+          </ExportableChart>
 
           <div className="rounded-xl border bg-card p-6">
             <DataTable />

@@ -19,11 +19,11 @@ import {
 } from "@/components/ui/chart"
 
 const chartData = [
-  { purpose: "Leisure", visitors: 1850, fill: "hsl(142, 76%, 36%)" },
-  { purpose: "Business", visitors: 420, fill: "hsl(142, 71%, 45%)" },
-  { purpose: "Education", visitors: 180, fill: "hsl(140, 60%, 55%)" },
-  { purpose: "Official", visitors: 95, fill: "hsl(138, 50%, 65%)" },
-  { purpose: "Others", visitors: 215, fill: "hsl(136, 40%, 75%)" },
+  { purpose: "Leisure", visitors: 1850, fill: "var(--color-leisure)" },
+  { purpose: "Business", visitors: 420, fill: "var(--color-business)" },
+  { purpose: "Education", visitors: 180, fill: "var(--color-education)" },
+  { purpose: "Official", visitors: 95, fill: "var(--color-official)" },
+  { purpose: "Others", visitors: 215, fill: "var(--color-others)" },
 ]
 
 const chartConfig = {
@@ -36,35 +36,57 @@ const chartConfig = {
   },
   business: {
     label: "Business",
-    color: "hsl(142, 71%, 45%)",
+    color: "hsl(221, 83%, 53%)",
   },
   education: {
     label: "Education",
-    color: "hsl(140, 60%, 55%)",
+    color: "hsl(280, 65%, 60%)",
   },
   official: {
     label: "Official",
-    color: "hsl(138, 50%, 65%)",
+    color: "hsl(45, 93%, 58%)",
   },
   others: {
     label: "Others",
-    color: "hsl(136, 40%, 75%)",
+    color: "hsl(199, 89%, 48%)",
   },
 } satisfies ChartConfig
 
 export function PurposeOfVisitChart() {
   const totalVisitors = chartData.reduce((acc, curr) => acc + curr.visitors, 0)
 
+  const CustomLegend = () => (
+    <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm mt-4">
+      {chartData.map((entry) => {
+        const configKey = entry.purpose.toLowerCase() as keyof typeof chartConfig
+        const configItem = chartConfig[configKey]
+        const color = (configItem && 'color' in configItem) ? configItem.color : 'hsl(0, 0%, 50%)'
+        
+        return (
+          <div key={entry.purpose} className="flex items-center gap-2">
+            <div
+              className="h-3 w-3 rounded-sm flex-shrink-0"
+              style={{ backgroundColor: color }}
+            />
+            <span className="text-muted-foreground whitespace-nowrap">
+              {entry.purpose}: <span className="font-medium text-foreground">{entry.visitors.toLocaleString()}</span>
+            </span>
+          </div>
+        )
+      })}
+    </div>
+  )
+
   return (
-    <Card className="flex flex-col">
+    <Card className="flex flex-col h-full min-h-[500px]">
       <CardHeader className="items-center pb-0">
         <CardTitle>Purpose of Visit</CardTitle>
         <CardDescription>Tourist visit purposes breakdown</CardDescription>
       </CardHeader>
-      <CardContent className="flex-1 pb-0">
+      <CardContent className="flex-1 pb-0 flex flex-col">
         <ChartContainer
           config={chartConfig}
-          className="mx-auto aspect-square max-h-[300px]"
+          className="mx-auto aspect-square w-full max-h-[280px]"
         >
           <PieChart>
             <ChartTooltip
@@ -110,6 +132,7 @@ export function PurposeOfVisitChart() {
             </Pie>
           </PieChart>
         </ChartContainer>
+        <CustomLegend />
       </CardContent>
       <CardFooter className="flex-col gap-2 text-sm">
         <div className="flex items-center gap-2 font-medium leading-none">
