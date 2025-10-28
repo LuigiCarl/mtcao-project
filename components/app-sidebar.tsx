@@ -51,15 +51,19 @@ const data = {
       url: "#",
       items: [
         {
+          title: "Monthly Reports",
+          url: "/reports",
+          icon: FileText,
+        },
+        {
+          title: "Boat Reports",
+          url: "/reports/boats",
+          icon: Database,
+        },
+        {
           title: "Analytics",
           url: "#",
           icon: BarChart3,
-          badge: "Coming Soon",
-        },
-        {
-          title: "Reports",
-          url: "#",
-          icon: FileText,
           badge: "Coming Soon",
         },
       ],
