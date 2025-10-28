@@ -56,7 +56,11 @@ export function PieChartComponent() {
             cursor={false}
             content={<ChartTooltipContent hideLabel />}
           />
-          <Pie data={chartData} dataKey="visitors" nameKey="browser" />
+          <Pie 
+            data={chartData} 
+            dataKey="visitors" 
+            nameKey="browser"
+          />
         </PieChart>
       </ChartContainer>
     </div>

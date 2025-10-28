@@ -65,8 +65,8 @@ export function TouristNationalityChart() {
               cursor={false}
               content={<ChartTooltipContent indicator="dashed" />}
             />
-            <Bar dataKey="foreign" fill="var(--color-foreign)" radius={4} />
-            <Bar dataKey="domestic" fill="var(--color-domestic)" radius={4} />
+            <Bar dataKey="foreign" fill="var(--color-foreign)" radius={4} animationDuration={400} />
+            <Bar dataKey="domestic" fill="var(--color-domestic)" radius={4} animationDuration={400} />
           </BarChart>
         </ChartContainer>
       </CardContent>

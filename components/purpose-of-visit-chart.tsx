@@ -77,6 +77,8 @@ export function PurposeOfVisitChart() {
               nameKey="purpose"
               innerRadius={60}
               strokeWidth={5}
+              animationDuration={800}
+              animationBegin={0}
             >
               <Label
                 content={({ viewBox }) => {
