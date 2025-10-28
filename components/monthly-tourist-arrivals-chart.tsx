@@ -83,8 +83,22 @@ export function MonthlyTouristArrivalsChart() {
               content={<ChartTooltipContent indicator="dashed" />}
             />
             <Legend />
-            <Bar dataKey="foreign" fill="var(--color-foreign)" radius={4} />
-            <Bar dataKey="domestic" fill="var(--color-domestic)" radius={4} />
+            <Bar 
+              dataKey="foreign" 
+              fill="var(--color-foreign)" 
+              radius={4}
+              animationBegin={0}
+              animationDuration={800}
+              animationEasing="ease-in-out"
+            />
+            <Bar 
+              dataKey="domestic" 
+              fill="var(--color-domestic)" 
+              radius={4}
+              animationBegin={100}
+              animationDuration={800}
+              animationEasing="ease-in-out"
+            />
           </BarChart>
         </ChartContainer>
       </CardContent>

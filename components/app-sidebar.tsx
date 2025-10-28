@@ -1,4 +1,8 @@
+"use client"
+
 import * as React from "react"
+import Link from "next/link"
+import { usePathname } from "next/navigation"
 import {
   Database,
   FileText,
@@ -37,7 +41,6 @@ const data = {
           title: "Dashboard",
           url: "/dashboard",
           icon: Database,
-          isActive: true,
         },
         {
           title: "Forms",
@@ -59,12 +62,6 @@ const data = {
           title: "Boat Reports",
           url: "/reports/boats",
           icon: Database,
-        },
-        {
-          title: "Analytics",
-          url: "#",
-          icon: BarChart3,
-          badge: "Coming Soon",
         },
       ],
     },
@@ -101,6 +98,8 @@ const data = {
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const pathname = usePathname()
+
   return (
     <Sidebar {...props}>
       <SidebarHeader>
@@ -117,23 +116,28 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <SidebarGroupLabel>{item.title}</SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
-                {item.items.map((subItem) => (
-                  <SidebarMenuItem key={subItem.title}>
-                    <SidebarMenuButton asChild isActive={'isActive' in subItem ? subItem.isActive : false}>
-                      <a href={subItem.url} className="flex items-center justify-between w-full">
-                        <span className="flex items-center gap-2">
-                          {subItem.icon && <subItem.icon className="h-4 w-4" />}
-                          <span>{subItem.title}</span>
-                        </span>
-                        {'badge' in subItem && subItem.badge && (
-                          <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-orange-100 text-orange-700 dark:bg-orange-950 dark:text-orange-400">
-                            {subItem.badge}
+                {item.items.map((subItem) => {
+                  const isActive = pathname === subItem.url || 
+                    (subItem.url === '/dashboard' && pathname === '/')
+                  
+                  return (
+                    <SidebarMenuItem key={subItem.title}>
+                      <SidebarMenuButton asChild isActive={isActive}>
+                        <Link href={subItem.url} className="flex items-center justify-between w-full">
+                          <span className="flex items-center gap-2">
+                            {subItem.icon && <subItem.icon className="h-4 w-4" />}
+                            <span>{subItem.title}</span>
                           </span>
-                        )}
-                      </a>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ))}
+                          {'badge' in subItem && subItem.badge && (
+                            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-orange-100 text-orange-700 dark:bg-orange-950 dark:text-orange-400">
+                              {subItem.badge}
+                            </span>
+                          )}
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  )
+                })}
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>

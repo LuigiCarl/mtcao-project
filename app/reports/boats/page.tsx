@@ -87,80 +87,76 @@ export default function BoatReportsPage() {
     const totalTrips = boatPerformanceData.reduce((sum, b) => sum + b.trips, 0)
     const totalTourists = boatPerformanceData.reduce((sum, b) => sum + b.tourists, 0)
 
-    const performanceRows = boatPerformanceData.map(boat => `
-      <tr>
-        <td>${boat.boatName}</td>
-        <td style="text-align: right;">${boat.trips}</td>
-        <td style="text-align: right;">${boat.tourists.toLocaleString()}</td>
-        <td style="text-align: right;">${boat.avgTourists}</td>
-        <td style="text-align: right;">${boat.contribution}%</td>
-        <td style="text-align: right;">${boat.rating}</td>
-      </tr>
-    `).join('')
+    const performanceRows = boatPerformanceData.map(boat => (
+      '<tr>' +
+        '<td>' + boat.boatName + '</td>' +
+        '<td style="text-align: right;">' + boat.trips + '</td>' +
+        '<td style="text-align: right;">' + boat.tourists.toLocaleString() + '</td>' +
+        '<td style="text-align: right;">' + boat.avgTourists + '</td>' +
+        '<td style="text-align: right;">' + boat.contribution + '%</td>' +
+        '<td style="text-align: right;">' + boat.rating + '</td>' +
+      '</tr>'
+    )).join('')
 
-    const content = `
-      <div class="summary">
-        <h2>Boat Rotation Report Summary - ${selectedMonth}</h2>
-        <p><strong>Active Boats:</strong> 5</p>
-        <p><strong>Total Trips Completed:</strong> ${totalTrips}</p>
-        <p><strong>Total Tourists Served:</strong> ${totalTourists.toLocaleString()}</p>
-        <p><strong>Average Trips per Boat:</strong> ${(totalTrips / 5).toFixed(1)}</p>
-        <p><strong>Fleet Utilization Rate:</strong> 87.2%</p>
-        <p><strong>Rotation Fairness Score:</strong> 94.5%</p>
-        <p><strong>Rotation Violations:</strong> 0 (Perfect compliance)</p>
-      </div>
-
-      <h2>Rotation System Overview</h2>
-      <p>
-        Boats operate on a fair rotation system where each boat waits its turn to serve tourists. 
-        After completing a trip, the boat moves to the end of the queue, and the next boat in line 
-        serves the next group of tourists. This ensures equal opportunity and fair income distribution 
-        among all boat operators.
-      </p>
-      
-      <h2>Individual Boat Performance</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Boat Name</th>
-            <th style="text-align: right;">Trips Completed</th>
-            <th style="text-align: right;">Tourists Served</th>
-            <th style="text-align: right;">Avg Tourists/Trip</th>
-            <th style="text-align: right;">Fleet Contribution</th>
-            <th style="text-align: right;">Fairness Rating</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${performanceRows}
-          <tr style="font-weight: bold; background-color: #e8f4f8;">
-            <td>TOTAL FLEET</td>
-            <td style="text-align: right;">${totalTrips}</td>
-            <td style="text-align: right;">${totalTourists.toLocaleString()}</td>
-            <td style="text-align: right;">${(totalTourists / totalTrips).toFixed(1)}</td>
-            <td style="text-align: right;">100%</td>
-            <td style="text-align: right;">Overall Rating</td>
-          </tr>
-        </tbody>
-      </table>
-
-      <h2>Key Insights</h2>
-      <ul>
-        <li>All boats maintaining fair rotation with minimal variance (±2 trips)</li>
-        <li>Zero rotation violations this month - excellent compliance</li>
-        <li>Fleet utilization at 87.2% - above industry standard</li>
-        <li>Ocean Explorer serves most tourists per trip (45 avg) due to larger capacity</li>
-        <li>Morning Glory has fewer trips - recommend investigating if maintenance needed</li>
-      </ul>
-
-      <h2>Recommendations</h2>
-      <ul>
-        <li>Monitor Morning Glory's performance - ensure no technical issues</li>
-        <li>Consider rewarding boats with highest compliance and safety records</li>
-        <li>Implement digital queue system for better real-time tracking</li>
-        <li>Schedule regular maintenance during low-season months</li>
-        <li>Expand fleet if demand consistently exceeds capacity</li>
-      </ul>
-    `
+    const content = (
+      '<div class="summary">' +
+        '<h2>Boat Rotation Report Summary - ' + selectedMonth + '</h2>' +
+        '<p><strong>Active Boats:</strong> 5</p>' +
+        '<p><strong>Total Trips Completed:</strong> ' + totalTrips + '</p>' +
+        '<p><strong>Total Tourists Served:</strong> ' + totalTourists.toLocaleString() + '</p>' +
+        '<p><strong>Average Trips per Boat:</strong> ' + (totalTrips / 5).toFixed(1) + '</p>' +
+        '<p><strong>Fleet Utilization Rate:</strong> 87.2%</p>' +
+        '<p><strong>Rotation Fairness Score:</strong> 94.5%</p>' +
+        '<p><strong>Rotation Violations:</strong> 0 (Perfect compliance)</p>' +
+      '</div>' +
+      '<h2>Rotation System Overview</h2>' +
+      '<p>' +
+        'Boats operate on a fair rotation system where each boat waits its turn to serve tourists. ' +
+        'After completing a trip, the boat moves to the end of the queue, and the next boat in line ' +
+        'serves the next group of tourists. This ensures equal opportunity and fair income distribution ' +
+        'among all boat operators.' +
+      '</p>' +
+      '<h2>Individual Boat Performance</h2>' +
+      '<table>' +
+        '<thead>' +
+          '<tr>' +
+            '<th>Boat Name</th>' +
+            '<th style="text-align: right;">Trips Completed</th>' +
+            '<th style="text-align: right;">Tourists Served</th>' +
+            '<th style="text-align: right;">Avg Tourists/Trip</th>' +
+            '<th style="text-align: right;">Fleet Contribution</th>' +
+            '<th style="text-align: right;">Fairness Rating</th>' +
+          '</tr>' +
+        '</thead>' +
+        '<tbody>' +
+          performanceRows +
+          '<tr style="font-weight: bold; background-color: #e8f4f8;">' +
+            '<td>TOTAL FLEET</td>' +
+            '<td style="text-align: right;">' + totalTrips + '</td>' +
+            '<td style="text-align: right;">' + totalTourists.toLocaleString() + '</td>' +
+            '<td style="text-align: right;">' + (totalTourists / totalTrips).toFixed(1) + '</td>' +
+            '<td style="text-align: right;">100%</td>' +
+            '<td style="text-align: right;">Overall Rating</td>' +
+          '</tr>' +
+        '</tbody>' +
+      '</table>' +
+      '<h2>Key Insights</h2>' +
+      '<ul>' +
+        '<li>All boats maintaining fair rotation with minimal variance (±2 trips)</li>' +
+        '<li>Zero rotation violations this month - excellent compliance</li>' +
+        '<li>Fleet utilization at 87.2% - above industry standard</li>' +
+        '<li>Ocean Explorer serves most tourists per trip (45 avg) due to larger capacity</li>' +
+        '<li>Morning Glory has fewer trips - recommend investigating if maintenance needed</li>' +
+      '</ul>' +
+      '<h2>Recommendations</h2>' +
+      '<ul>' +
+        '<li>Monitor Morning Glory\'s performance - ensure no technical issues</li>' +
+        '<li>Consider rewarding boats with highest compliance and safety records</li>' +
+        '<li>Implement digital queue system for better real-time tracking</li>' +
+        '<li>Schedule regular maintenance during low-season months</li>' +
+        '<li>Expand fleet if demand consistently exceeds capacity</li>' +
+      '</ul>'
+    )
 
     exportToPDF("Boat Rotation Report - " + selectedMonth, content)
   }
@@ -193,11 +189,11 @@ export default function BoatReportsPage() {
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="sm">
                   <Download className="mr-2 h-4 w-4" />
-                  Export Report
+                  Export {selectedMonth}
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuLabel>Export Format</DropdownMenuLabel>
+                <DropdownMenuLabel>Export {selectedMonth}</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleExportCSV}>
                   <FileSpreadsheet className="mr-2 h-4 w-4" />
@@ -215,8 +211,8 @@ export default function BoatReportsPage() {
 
         <div className="flex flex-1 flex-col gap-4 p-4 md:p-6">
           {/* Page Header */}
-          <div className="flex flex-col gap-2">
-            <div className="flex items-center justify-between">
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
               <div>
                 <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
                   <Ship className="h-8 w-8" />
@@ -229,7 +225,7 @@ export default function BoatReportsPage() {
               <div className="flex items-center gap-2">
                 <Calendar className="h-4 w-4 text-muted-foreground" />
                 <Select value={selectedMonth} onValueChange={setSelectedMonth}>
-                  <SelectTrigger className="w-[180px]">
+                  <SelectTrigger className="w-full md:w-[180px]">
                     <SelectValue placeholder="Select month" />
                   </SelectTrigger>
                   <SelectContent>
@@ -285,78 +281,78 @@ export default function BoatReportsPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="rounded-md border">
+              <div className="rounded-md border overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b bg-muted/50">
-                      <th className="p-4 text-left font-medium">Boat Name</th>
-                      <th className="p-4 text-right font-medium">Trips Completed</th>
-                      <th className="p-4 text-right font-medium">Tourists Served</th>
-                      <th className="p-4 text-right font-medium">Avg Tourists/Trip</th>
-                      <th className="p-4 text-right font-medium">Fleet Contribution</th>
-                      <th className="p-4 text-right font-medium">Fairness Rating</th>
+                      <th className="p-4 text-left font-medium whitespace-nowrap">Boat Name</th>
+                      <th className="p-4 text-right font-medium whitespace-nowrap">Trips Completed</th>
+                      <th className="p-4 text-right font-medium whitespace-nowrap">Tourists Served</th>
+                      <th className="p-4 text-right font-medium whitespace-nowrap">Avg Tourists/Trip</th>
+                      <th className="p-4 text-right font-medium whitespace-nowrap">Fleet Contribution</th>
+                      <th className="p-4 text-right font-medium whitespace-nowrap">Fairness Rating</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr className="border-b hover:bg-muted/50">
-                      <td className="p-4 font-medium">Sunset Cruiser</td>
-                      <td className="p-4 text-right">21</td>
-                      <td className="p-4 text-right">462</td>
-                      <td className="p-4 text-right">22</td>
-                      <td className="p-4 text-right">22.3%</td>
-                      <td className="p-4 text-right">
+                      <td className="p-4 font-medium whitespace-nowrap">Sunset Cruiser</td>
+                      <td className="p-4 text-right whitespace-nowrap">21</td>
+                      <td className="p-4 text-right whitespace-nowrap">462</td>
+                      <td className="p-4 text-right whitespace-nowrap">22</td>
+                      <td className="p-4 text-right whitespace-nowrap">22.3%</td>
+                      <td className="p-4 text-right whitespace-nowrap">
                         <span className="text-green-600 font-semibold">Excellent</span>
                       </td>
                     </tr>
                     <tr className="border-b hover:bg-muted/50">
-                      <td className="p-4 font-medium">Ocean Explorer</td>
-                      <td className="p-4 text-right">19</td>
-                      <td className="p-4 text-right">855</td>
-                      <td className="p-4 text-right">45</td>
-                      <td className="p-4 text-right">20.2%</td>
-                      <td className="p-4 text-right">
+                      <td className="p-4 font-medium whitespace-nowrap">Ocean Explorer</td>
+                      <td className="p-4 text-right whitespace-nowrap">19</td>
+                      <td className="p-4 text-right whitespace-nowrap">855</td>
+                      <td className="p-4 text-right whitespace-nowrap">45</td>
+                      <td className="p-4 text-right whitespace-nowrap">20.2%</td>
+                      <td className="p-4 text-right whitespace-nowrap">
                         <span className="text-green-600 font-semibold">Good</span>
                       </td>
                     </tr>
                     <tr className="border-b hover:bg-muted/50">
-                      <td className="p-4 font-medium">Sea Breeze</td>
-                      <td className="p-4 text-right">19</td>
-                      <td className="p-4 text-right">285</td>
-                      <td className="p-4 text-right">15</td>
-                      <td className="p-4 text-right">20.2%</td>
-                      <td className="p-4 text-right">
+                      <td className="p-4 font-medium whitespace-nowrap">Sea Breeze</td>
+                      <td className="p-4 text-right whitespace-nowrap">19</td>
+                      <td className="p-4 text-right whitespace-nowrap">285</td>
+                      <td className="p-4 text-right whitespace-nowrap">15</td>
+                      <td className="p-4 text-right whitespace-nowrap">20.2%</td>
+                      <td className="p-4 text-right whitespace-nowrap">
                         <span className="text-green-600 font-semibold">Good</span>
                       </td>
                     </tr>
                     <tr className="border-b hover:bg-muted/50">
-                      <td className="p-4 font-medium">Island Hopper</td>
-                      <td className="p-4 text-right">18</td>
-                      <td className="p-4 text-right">216</td>
-                      <td className="p-4 text-right">12</td>
-                      <td className="p-4 text-right">19.1%</td>
-                      <td className="p-4 text-right">
+                      <td className="p-4 font-medium whitespace-nowrap">Island Hopper</td>
+                      <td className="p-4 text-right whitespace-nowrap">18</td>
+                      <td className="p-4 text-right whitespace-nowrap">216</td>
+                      <td className="p-4 text-right whitespace-nowrap">12</td>
+                      <td className="p-4 text-right whitespace-nowrap">19.1%</td>
+                      <td className="p-4 text-right whitespace-nowrap">
                         <span className="text-green-600 font-semibold">Good</span>
                       </td>
                     </tr>
                     <tr className="border-b last:border-0 hover:bg-muted/50">
-                      <td className="p-4 font-medium">Morning Glory</td>
-                      <td className="p-4 text-right">17</td>
-                      <td className="p-4 text-right">136</td>
-                      <td className="p-4 text-right">8</td>
-                      <td className="p-4 text-right">18.1%</td>
-                      <td className="p-4 text-right">
+                      <td className="p-4 font-medium whitespace-nowrap">Morning Glory</td>
+                      <td className="p-4 text-right whitespace-nowrap">17</td>
+                      <td className="p-4 text-right whitespace-nowrap">136</td>
+                      <td className="p-4 text-right whitespace-nowrap">8</td>
+                      <td className="p-4 text-right whitespace-nowrap">18.1%</td>
+                      <td className="p-4 text-right whitespace-nowrap">
                         <span className="text-yellow-600 font-semibold">Fair</span>
                       </td>
                     </tr>
                   </tbody>
                   <tfoot>
                     <tr className="border-t-2 bg-muted/50 font-bold">
-                      <td className="p-4">Total Fleet</td>
-                      <td className="p-4 text-right">94</td>
-                      <td className="p-4 text-right">1,954</td>
-                      <td className="p-4 text-right">20.8</td>
-                      <td className="p-4 text-right">100%</td>
-                      <td className="p-4 text-right">
+                      <td className="p-4 whitespace-nowrap">Total Fleet</td>
+                      <td className="p-4 text-right whitespace-nowrap">94</td>
+                      <td className="p-4 text-right whitespace-nowrap">1,954</td>
+                      <td className="p-4 text-right whitespace-nowrap">20.8</td>
+                      <td className="p-4 text-right whitespace-nowrap">100%</td>
+                      <td className="p-4 text-right whitespace-nowrap">
                         <span className="text-xs text-muted-foreground">Overall Rating</span>
                       </td>
                     </tr>

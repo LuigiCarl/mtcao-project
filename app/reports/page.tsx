@@ -41,11 +41,11 @@ import { exportToCSV, exportToPDF, formatForExport } from "@/lib/export-utils"
 
 // Sample data for the detailed monthly breakdown
 const monthlyBreakdown = [
-  { month: "October 2025", foreign: 2180, domestic: 1340, total: 3520 },
-  { month: "September 2025", foreign: 2450, domestic: 1520, total: 3970 },
-  { month: "August 2025", foreign: 2760, domestic: 1720, total: 4480 },
-  { month: "July 2025", foreign: 2890, domestic: 1840, total: 4730 },
-  { month: "June 2025", foreign: 2580, domestic: 1620, total: 4200 },
+  { month: "Oct 2025", foreign: 2180, domestic: 1340, total: 3520 },
+  { month: "Sep 2025", foreign: 2450, domestic: 1520, total: 3970 },
+  { month: "Aug 2025", foreign: 2760, domestic: 1720, total: 4480 },
+  { month: "Jul 2025", foreign: 2890, domestic: 1840, total: 4730 },
+  { month: "Jun 2025", foreign: 2580, domestic: 1620, total: 4200 },
   { month: "May 2025", foreign: 2340, domestic: 1420, total: 3760 },
 ]
 
@@ -53,96 +53,91 @@ export default function ReportsPage() {
   const [selectedMonth, setSelectedMonth] = useState("Oct 2025")
 
   const handleExportCSV = () => {
-    const formattedData = formatForExport(monthlyBreakdown, {
-      month: "Month",
-      foreign: "Foreign Tourists",
-      domestic: "Domestic Tourists",
-      total: "Total Arrivals",
-    })
+    // Find the selected month's data
+    const selectedData = monthlyBreakdown.find(m => m.month === selectedMonth)
+    
+    if (selectedData) {
+      const formattedData = formatForExport([selectedData], {
+        month: "Month",
+        foreign: "Foreign Tourists",
+        domestic: "Domestic Tourists",
+        total: "Total Arrivals",
+      })
 
-    const totalForeign = monthlyBreakdown.reduce((sum, m) => sum + m.foreign, 0)
-    const totalDomestic = monthlyBreakdown.reduce((sum, m) => sum + m.domestic, 0)
-    const totalAll = monthlyBreakdown.reduce((sum, m) => sum + m.total, 0)
+      const foreignPercent = ((selectedData.foreign / selectedData.total) * 100).toFixed(1)
+      const domesticPercent = ((selectedData.domestic / selectedData.total) * 100).toFixed(1)
 
-    const dataWithTotals = [
-      ...formattedData,
-      {
-        "Month": "TOTAL (6 Months)",
-        "Foreign Tourists": totalForeign,
-        "Domestic Tourists": totalDomestic,
-        "Total Arrivals": totalAll,
-      }
-    ]
+      const dataWithPercentages = [
+        ...formattedData,
+        {
+          "Month": "Breakdown",
+          "Foreign Tourists": foreignPercent + '%',
+          "Domestic Tourists": domesticPercent + '%',
+          "Total Arrivals": '100%',
+        }
+      ]
 
-    exportToCSV(
-      dataWithTotals,
-      `Monthly_Tourist_Report_${new Date().toISOString().split('T')[0]}`,
-    )
+      exportToCSV(
+        dataWithPercentages,
+        `Tourist_Report_${selectedMonth.replace(' ', '_')}_${new Date().toISOString().split('T')[0]}`,
+      )
+    }
   }
 
   const handleExportPDF = () => {
-    const totalForeign = monthlyBreakdown.reduce((sum, m) => sum + m.foreign, 0)
-    const totalDomestic = monthlyBreakdown.reduce((sum, m) => sum + m.domestic, 0)
-    const totalAll = monthlyBreakdown.reduce((sum, m) => sum + m.total, 0)
+    // Find the selected month's data
+    const selectedData = monthlyBreakdown.find(m => m.month === selectedMonth)
+    
+    if (!selectedData) return
 
-    const tableRows = monthlyBreakdown.map(row => {
-      const foreignPercent = ((row.foreign / row.total) * 100).toFixed(1)
-      const domesticPercent = ((row.domestic / row.total) * 100).toFixed(1)
-      return `
-        <tr>
-          <td>${row.month}</td>
-          <td style="text-align: right;">${row.foreign.toLocaleString()}</td>
-          <td style="text-align: right;">${row.domestic.toLocaleString()}</td>
-          <td style="text-align: right;"><strong>${row.total.toLocaleString()}</strong></td>
-          <td style="text-align: right;">${foreignPercent}%</td>
-          <td style="text-align: right;">${domesticPercent}%</td>
-        </tr>
-      `
-    }).join('')
+    const foreignPercent = ((selectedData.foreign / selectedData.total) * 100).toFixed(1)
+    const domesticPercent = ((selectedData.domestic / selectedData.total) * 100).toFixed(1)
 
-    const content = `
-      <div class="summary">
-        <h2>Report Summary</h2>
-        <p><strong>Report Period:</strong> Last 6 Months (May - October 2025)</p>
-        <p><strong>Total Foreign Tourists:</strong> ${totalForeign.toLocaleString()}</p>
-        <p><strong>Total Domestic Tourists:</strong> ${totalDomestic.toLocaleString()}</p>
-        <p><strong>Grand Total:</strong> ${totalAll.toLocaleString()}</p>
-      </div>
-      
-      <h2>Detailed Monthly Breakdown</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Month</th>
-            <th style="text-align: right;">Foreign Tourists</th>
-            <th style="text-align: right;">Domestic Tourists</th>
-            <th style="text-align: right;">Total Arrivals</th>
-            <th style="text-align: right;">Foreign %</th>
-            <th style="text-align: right;">Domestic %</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${tableRows}
-          <tr style="font-weight: bold; background-color: #e8f4f8;">
-            <td>TOTAL (6 Months)</td>
-            <td style="text-align: right;">${totalForeign.toLocaleString()}</td>
-            <td style="text-align: right;">${totalDomestic.toLocaleString()}</td>
-            <td style="text-align: right;">${totalAll.toLocaleString()}</td>
-            <td colspan="2" style="text-align: right;">Aggregated totals</td>
-          </tr>
-        </tbody>
-      </table>
+    const content = (
+      '<div class="summary">' +
+        '<h2>Tourist Arrivals Report - ' + selectedMonth + '</h2>' +
+        '<p><strong>Report Generated:</strong> ' + new Date().toLocaleDateString() + '</p>' +
+        '<p><strong>Foreign Tourists:</strong> ' + selectedData.foreign.toLocaleString() + ' (' + foreignPercent + '%)</p>' +
+        '<p><strong>Domestic Tourists:</strong> ' + selectedData.domestic.toLocaleString() + ' (' + domesticPercent + '%)</p>' +
+        '<p><strong>Total Arrivals:</strong> ' + selectedData.total.toLocaleString() + '</p>' +
+      '</div>' +
+      '<h2>Detailed Breakdown</h2>' +
+      '<table>' +
+        '<thead>' +
+          '<tr>' +
+            '<th>Category</th>' +
+            '<th style="text-align: right;">Count</th>' +
+            '<th style="text-align: right;">Percentage</th>' +
+          '</tr>' +
+        '</thead>' +
+        '<tbody>' +
+          '<tr>' +
+            '<td>Foreign Tourists</td>' +
+            '<td style="text-align: right;">' + selectedData.foreign.toLocaleString() + '</td>' +
+            '<td style="text-align: right;">' + foreignPercent + '%</td>' +
+          '</tr>' +
+          '<tr>' +
+            '<td>Domestic Tourists</td>' +
+            '<td style="text-align: right;">' + selectedData.domestic.toLocaleString() + '</td>' +
+            '<td style="text-align: right;">' + domesticPercent + '%</td>' +
+          '</tr>' +
+          '<tr style="font-weight: bold; background-color: #e8f4f8;">' +
+            '<td>Total</td>' +
+            '<td style="text-align: right;">' + selectedData.total.toLocaleString() + '</td>' +
+            '<td style="text-align: right;">100%</td>' +
+          '</tr>' +
+        '</tbody>' +
+      '</table>' +
+      '<h2>Analysis</h2>' +
+      '<ul>' +
+        '<li>Foreign tourists represent ' + foreignPercent + '% of total arrivals</li>' +
+        '<li>Domestic tourists represent ' + domesticPercent + '% of total arrivals</li>' +
+        '<li>Total tourist arrivals: ' + selectedData.total.toLocaleString() + '</li>' +
+        '<li>Foreign to domestic ratio: ' + (selectedData.foreign / selectedData.domestic).toFixed(2) + ':1</li>' +
+      '</ul>'
+    )
 
-      <h2>Key Insights</h2>
-      <ul>
-        <li>Peak season observed in July 2025 with 4,730 total arrivals</li>
-        <li>Foreign tourists consistently account for ~60% of all arrivals</li>
-        <li>Steady growth trend throughout the summer months</li>
-        <li>October shows seasonal decline, typical for fall period</li>
-      </ul>
-    `
-
-    exportToPDF("Monthly Tourist Arrivals Report", content)
+    exportToPDF("Tourist Report - " + selectedMonth, content)
   }
 
   return (
@@ -173,11 +168,11 @@ export default function ReportsPage() {
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="sm">
                   <Download className="mr-2 h-4 w-4" />
-                  Export Report
+                  Export {selectedMonth}
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuLabel>Export Format</DropdownMenuLabel>
+                <DropdownMenuLabel>Export {selectedMonth}</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleExportCSV}>
                   <FileSpreadsheet className="mr-2 h-4 w-4" />
@@ -195,8 +190,8 @@ export default function ReportsPage() {
 
         <div className="flex flex-1 flex-col gap-4 p-4 md:p-6">
           {/* Page Header */}
-          <div className="flex flex-col gap-2">
-            <div className="flex items-center justify-between">
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
               <div>
                 <h1 className="text-3xl font-bold tracking-tight">Monthly Tourist Reports</h1>
                 <p className="text-muted-foreground">
@@ -206,7 +201,7 @@ export default function ReportsPage() {
               <div className="flex items-center gap-2">
                 <Calendar className="h-4 w-4 text-muted-foreground" />
                 <Select value={selectedMonth} onValueChange={setSelectedMonth}>
-                  <SelectTrigger className="w-[180px]">
+                  <SelectTrigger className="w-full md:w-[180px]">
                     <SelectValue placeholder="Select month" />
                   </SelectTrigger>
                   <SelectContent>
@@ -241,16 +236,16 @@ export default function ReportsPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="rounded-md border">
+              <div className="rounded-md border overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b bg-muted/50">
-                      <th className="p-4 text-left font-medium">Month</th>
-                      <th className="p-4 text-right font-medium">Foreign Tourists</th>
-                      <th className="p-4 text-right font-medium">Domestic Tourists</th>
-                      <th className="p-4 text-right font-medium">Total Arrivals</th>
-                      <th className="p-4 text-right font-medium">Foreign %</th>
-                      <th className="p-4 text-right font-medium">Domestic %</th>
+                      <th className="p-4 text-left font-medium whitespace-nowrap">Month</th>
+                      <th className="p-4 text-right font-medium whitespace-nowrap">Foreign Tourists</th>
+                      <th className="p-4 text-right font-medium whitespace-nowrap">Domestic Tourists</th>
+                      <th className="p-4 text-right font-medium whitespace-nowrap">Total Arrivals</th>
+                      <th className="p-4 text-right font-medium whitespace-nowrap">Foreign %</th>
+                      <th className="p-4 text-right font-medium whitespace-nowrap">Domestic %</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -259,14 +254,14 @@ export default function ReportsPage() {
                       const domesticPercent = ((row.domestic / row.total) * 100).toFixed(1)
                       return (
                         <tr key={index} className="border-b last:border-0 hover:bg-muted/50">
-                          <td className="p-4 font-medium">{row.month}</td>
-                          <td className="p-4 text-right">{row.foreign.toLocaleString()}</td>
-                          <td className="p-4 text-right">{row.domestic.toLocaleString()}</td>
-                          <td className="p-4 text-right font-semibold">{row.total.toLocaleString()}</td>
-                          <td className="p-4 text-right text-blue-600 dark:text-blue-400">
+                          <td className="p-4 font-medium whitespace-nowrap">{row.month}</td>
+                          <td className="p-4 text-right whitespace-nowrap">{row.foreign.toLocaleString()}</td>
+                          <td className="p-4 text-right whitespace-nowrap">{row.domestic.toLocaleString()}</td>
+                          <td className="p-4 text-right font-semibold whitespace-nowrap">{row.total.toLocaleString()}</td>
+                          <td className="p-4 text-right text-blue-600 dark:text-blue-400 whitespace-nowrap">
                             {foreignPercent}%
                           </td>
-                          <td className="p-4 text-right text-green-600 dark:text-green-400">
+                          <td className="p-4 text-right text-green-600 dark:text-green-400 whitespace-nowrap">
                             {domesticPercent}%
                           </td>
                         </tr>
@@ -275,17 +270,17 @@ export default function ReportsPage() {
                   </tbody>
                   <tfoot>
                     <tr className="border-t-2 bg-muted/50 font-bold">
-                      <td className="p-4">Total (6 Months)</td>
-                      <td className="p-4 text-right">
+                      <td className="p-4 whitespace-nowrap">Total (6 Months)</td>
+                      <td className="p-4 text-right whitespace-nowrap">
                         {monthlyBreakdown.reduce((sum, row) => sum + row.foreign, 0).toLocaleString()}
                       </td>
-                      <td className="p-4 text-right">
+                      <td className="p-4 text-right whitespace-nowrap">
                         {monthlyBreakdown.reduce((sum, row) => sum + row.domestic, 0).toLocaleString()}
                       </td>
-                      <td className="p-4 text-right">
+                      <td className="p-4 text-right whitespace-nowrap">
                         {monthlyBreakdown.reduce((sum, row) => sum + row.total, 0).toLocaleString()}
                       </td>
-                      <td className="p-4 text-right" colSpan={2}>
+                      <td className="p-4 text-right whitespace-nowrap" colSpan={2}>
                         <span className="text-xs text-muted-foreground">Aggregated totals</span>
                       </td>
                     </tr>

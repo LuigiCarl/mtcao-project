@@ -1,7 +1,13 @@
 "use client"
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+import type { ReactNode } from "react"
+
+const Badge = ({ children, className }: { children: ReactNode; className?: string }) => {
+  const base = "inline-flex items-center px-2 py-0.5 rounded text-xs font-medium";
+  const cls = [base, className].filter(Boolean).join(" ");
+  return <span className={cls}>{children}</span>;
+}
 import { Ship, Clock, CheckCircle2, AlertCircle } from "lucide-react"
 
 // Sample boat rotation data - would come from your backend
@@ -90,15 +96,15 @@ const boatRotationData: BoatRotation[] = [
 const getStatusBadge = (status: string) => {
   switch (status) {
     case "available":
-      return <Badge className="bg-green-500 hover:bg-green-600">Next in Line</Badge>
+      return <Badge className="bg-green-500 hover:bg-green-600 text-white">Next in Line</Badge>
     case "on-trip":
-      return <Badge className="bg-blue-500 hover:bg-blue-600">On Trip</Badge>
+      return <Badge className="bg-blue-500 hover:bg-blue-600 text-white">On Trip</Badge>
     case "waiting":
-      return <Badge className="bg-yellow-500 hover:bg-yellow-600">Waiting</Badge>
+      return <Badge className="bg-yellow-500 hover:bg-yellow-600 text-white">Waiting</Badge>
     case "maintenance":
-      return <Badge className="bg-red-500 hover:bg-red-600">Maintenance</Badge>
+      return <Badge className="bg-red-500 hover:bg-red-600 text-white">Maintenance</Badge>
     default:
-      return <Badge variant="outline">{status}</Badge>
+      return <Badge className="border border-border text-foreground">{status}</Badge>
   }
 }
 
@@ -135,18 +141,18 @@ export function BoatRotationTable() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="rounded-md border">
+        <div className="rounded-md border overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b bg-muted/50">
-                <th className="p-4 text-left font-medium">Position</th>
-                <th className="p-4 text-left font-medium">Boat Information</th>
-                <th className="p-4 text-left font-medium">Captain</th>
-                <th className="p-4 text-left font-medium">Last Trip</th>
-                <th className="p-4 text-center font-medium">Status</th>
-                <th className="p-4 text-right font-medium">Trips (Month)</th>
-                <th className="p-4 text-right font-medium">Total Trips</th>
-                <th className="p-4 text-right font-medium">Avg Tourists</th>
+                <th className="p-4 text-left font-medium whitespace-nowrap">Position</th>
+                <th className="p-4 text-left font-medium whitespace-nowrap">Boat Information</th>
+                <th className="p-4 text-left font-medium whitespace-nowrap">Captain</th>
+                <th className="p-4 text-left font-medium whitespace-nowrap">Last Trip</th>
+                <th className="p-4 text-center font-medium whitespace-nowrap">Status</th>
+                <th className="p-4 text-right font-medium whitespace-nowrap">Trips (Month)</th>
+                <th className="p-4 text-right font-medium whitespace-nowrap">Total Trips</th>
+                <th className="p-4 text-right font-medium whitespace-nowrap">Avg Tourists</th>
               </tr>
             </thead>
             <tbody>
@@ -165,25 +171,25 @@ export function BoatRotationTable() {
                   </td>
                   <td className="p-4">
                     <div className="flex flex-col">
-                      <span className="font-semibold">{boat.boatName}</span>
-                      <span className="text-xs text-muted-foreground">{boat.registrationNumber}</span>
+                      <span className="font-semibold whitespace-nowrap">{boat.boatName}</span>
+                      <span className="text-xs text-muted-foreground whitespace-nowrap">{boat.registrationNumber}</span>
                     </div>
                   </td>
                   <td className="p-4">
-                    <span className="text-sm">{boat.captain}</span>
+                    <span className="whitespace-nowrap">{boat.captain}</span>
                   </td>
                   <td className="p-4">
                     <div className="flex flex-col">
-                      <span className="text-sm">{formatDate(boat.lastTripDate)}</span>
-                      <span className="text-xs text-muted-foreground">{boat.lastTripTime}</span>
+                      <span className="text-sm whitespace-nowrap">{formatDate(boat.lastTripDate)}</span>
+                      <span className="text-xs text-muted-foreground whitespace-nowrap">{boat.lastTripTime}</span>
                     </div>
                   </td>
                   <td className="p-4 text-center">
                     {getStatusBadge(boat.status)}
                   </td>
-                  <td className="p-4 text-right font-medium">{boat.totalTripsThisMonth}</td>
-                  <td className="p-4 text-right">{boat.totalTripsAllTime}</td>
-                  <td className="p-4 text-right">{boat.avgTouristsPerTrip}</td>
+                  <td className="p-4 text-right font-medium whitespace-nowrap">{boat.totalTripsThisMonth}</td>
+                  <td className="p-4 text-right whitespace-nowrap">{boat.totalTripsAllTime}</td>
+                  <td className="p-4 text-right whitespace-nowrap">{boat.avgTouristsPerTrip}</td>
                 </tr>
               ))}
             </tbody>

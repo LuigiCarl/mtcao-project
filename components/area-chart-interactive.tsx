@@ -185,6 +185,9 @@ export function AreaChartInteractive() {
             fill="url(#fillMobile)"
             stroke="var(--color-mobile)"
             stackId="a"
+            animationBegin={0}
+            animationDuration={1000}
+            animationEasing="ease-in-out"
           />
           <Area
             dataKey="desktop"
@@ -192,6 +195,9 @@ export function AreaChartInteractive() {
             fill="url(#fillDesktop)"
             stroke="var(--color-desktop)"
             stackId="a"
+            animationBegin={100}
+            animationDuration={1000}
+            animationEasing="ease-in-out"
           />
           <ChartLegend content={<ChartLegendContent />} />
         </AreaChart>

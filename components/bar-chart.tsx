@@ -43,7 +43,14 @@ export function BarChartComponent() {
             cursor={false}
             content={<ChartTooltipContent hideLabel />}
           />
-          <Bar dataKey="desktop" fill="var(--color-desktop)" radius={8} />
+          <Bar 
+            dataKey="desktop" 
+            fill="var(--color-desktop)" 
+            radius={8}
+            animationBegin={0}
+            animationDuration={800}
+            animationEasing="ease-in-out"
+          />
         </BarChart>
       </ChartContainer>
     </div>

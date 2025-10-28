@@ -45,6 +45,33 @@ const ChartContainer = React.forwardRef<
 >(({ id, className, children, config, ...props }, ref) => {
   const uniqueId = React.useId()
   const chartId = `chart-${id || uniqueId.replace(/:/g, "")}`
+  const [isResizing, setIsResizing] = React.useState(false)
+  const resizeTimerRef = React.useRef<NodeJS.Timeout | null>(null)
+
+  React.useEffect(() => {
+    const handleResize = () => {
+      setIsResizing(true)
+      
+      // Clear existing timer
+      if (resizeTimerRef.current) {
+        clearTimeout(resizeTimerRef.current)
+      }
+      
+      // Set new timer to mark resizing as complete after 150ms
+      resizeTimerRef.current = setTimeout(() => {
+        setIsResizing(false)
+      }, 150)
+    }
+
+    window.addEventListener('resize', handleResize)
+    
+    return () => {
+      window.removeEventListener('resize', handleResize)
+      if (resizeTimerRef.current) {
+        clearTimeout(resizeTimerRef.current)
+      }
+    }
+  }, [])
 
   return (
     <ChartContext.Provider value={{ config }}>
@@ -58,7 +85,7 @@ const ChartContainer = React.forwardRef<
         {...props}
       >
         <ChartStyle id={chartId} config={config} />
-        <RechartsPrimitive.ResponsiveContainer>
+        <RechartsPrimitive.ResponsiveContainer debounce={150}>
           {children}
         </RechartsPrimitive.ResponsiveContainer>
       </div>

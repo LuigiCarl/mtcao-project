@@ -135,17 +135,60 @@ export function BoatMonthlyReportChart() {
               content={<ChartTooltipContent indicator="dashed" />}
             />
             <Legend />
-            <Bar dataKey="Ocean Explorer" fill="var(--color-Ocean Explorer)" radius={4} stackId="boats" />
-            <Bar dataKey="Island Hopper" fill="var(--color-Island Hopper)" radius={4} stackId="boats" />
-            <Bar dataKey="Sunset Cruiser" fill="var(--color-Sunset Cruiser)" radius={4} stackId="boats" />
-            <Bar dataKey="Morning Glory" fill="var(--color-Morning Glory)" radius={4} stackId="boats" />
-            <Bar dataKey="Sea Breeze" fill="var(--color-Sea Breeze)" radius={4} stackId="boats" />
+            <Bar 
+              dataKey="Ocean Explorer" 
+              fill="var(--color-Ocean Explorer)" 
+              radius={4} 
+              stackId="boats"
+              animationBegin={0}
+              animationDuration={800}
+              animationEasing="ease-in-out"
+            />
+            <Bar 
+              dataKey="Island Hopper" 
+              fill="var(--color-Island Hopper)" 
+              radius={4} 
+              stackId="boats"
+              animationBegin={50}
+              animationDuration={800}
+              animationEasing="ease-in-out"
+            />
+            <Bar 
+              dataKey="Sunset Cruiser" 
+              fill="var(--color-Sunset Cruiser)" 
+              radius={4} 
+              stackId="boats"
+              animationBegin={100}
+              animationDuration={800}
+              animationEasing="ease-in-out"
+            />
+            <Bar 
+              dataKey="Morning Glory" 
+              fill="var(--color-Morning Glory)" 
+              radius={4} 
+              stackId="boats"
+              animationBegin={150}
+              animationDuration={800}
+              animationEasing="ease-in-out"
+            />
+            <Bar 
+              dataKey="Sea Breeze" 
+              fill="var(--color-Sea Breeze)" 
+              radius={4} 
+              stackId="boats"
+              animationBegin={200}
+              animationDuration={800}
+              animationEasing="ease-in-out"
+            />
             <Line 
               type="monotone" 
               dataKey="total" 
               stroke="var(--color-total)" 
               strokeWidth={2}
               dot={{ r: 4 }}
+              animationBegin={300}
+              animationDuration={1000}
+              animationEasing="ease-in-out"
             />
           </ComposedChart>
         </ChartContainer>
