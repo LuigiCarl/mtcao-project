@@ -19,42 +19,48 @@ import {
 } from "@/components/ui/chart"
 
 const chartData = [
-  { nationality: "Philippines", foreign: 320, domestic: 850, total: 1170 },
-  { nationality: "Korea", foreign: 450, domestic: 120, total: 570 },
-  { nationality: "USA", foreign: 380, domestic: 80, total: 460 },
-  { nationality: "Japan", foreign: 290, domestic: 60, total: 350 },
-  { nationality: "China", foreign: 240, domestic: 50, total: 290 },
-  { nationality: "Others", foreign: 180, domestic: 140, total: 320 },
+  { type: "Day Tour", visitors: 1240, fill: "hsl(142, 76%, 36%)" },
+  { type: "Overnight", visitors: 890, fill: "hsl(221, 83%, 53%)" },
+  { type: "Staycation", visitors: 630, fill: "hsl(280, 65%, 60%)" },
 ]
 
 const chartConfig = {
-  foreign: {
-    label: "Foreign",
+  visitors: {
+    label: "Visitors",
+  },
+  dayTour: {
+    label: "Day Tour",
     color: "hsl(142, 76%, 36%)",
   },
-  domestic: {
-    label: "Domestic",
-    color: "hsl(142, 71%, 45%)",
+  overnight: {
+    label: "Overnight",
+    color: "hsl(221, 83%, 53%)",
+  },
+  staycation: {
+    label: "Staycation",
+    color: "hsl(280, 65%, 60%)",
   },
 } satisfies ChartConfig
 
-export function TouristNationalityChart() {
+export function AccommodationTypeChart() {
+  const totalVisitors = chartData.reduce((acc, curr) => acc + curr.visitors, 0)
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Tourist by Nationality</CardTitle>
-        <CardDescription>Foreign vs Domestic breakdown</CardDescription>
+        <CardTitle>Accommodation Type</CardTitle>
+        <CardDescription>Tourist accommodation preferences</CardDescription>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig}>
           <BarChart accessibilityLayer data={chartData}>
             <CartesianGrid vertical={false} />
             <XAxis
-              dataKey="nationality"
+              dataKey="type"
               tickLine={false}
               tickMargin={10}
               axisLine={false}
-              tickFormatter={(value) => value.slice(0, 3)}
+              tickFormatter={(value) => value}
             />
             <YAxis
               tickLine={false}
@@ -63,19 +69,22 @@ export function TouristNationalityChart() {
             />
             <ChartTooltip
               cursor={false}
-              content={<ChartTooltipContent indicator="dashed" />}
+              content={<ChartTooltipContent hideLabel />}
             />
-            <Bar dataKey="foreign" fill="var(--color-foreign)" radius={4} />
-            <Bar dataKey="domestic" fill="var(--color-domestic)" radius={4} />
+            <Bar
+              dataKey="visitors"
+              radius={8}
+              fill="var(--color-visitors)"
+            />
           </BarChart>
         </ChartContainer>
       </CardContent>
       <CardFooter className="flex-col items-start gap-2 text-sm">
         <div className="flex gap-2 font-medium leading-none">
-          Trending up by 12.5% this month <TrendingUp className="h-4 w-4" />
+          Day tours most popular this month <TrendingUp className="h-4 w-4" />
         </div>
         <div className="leading-none text-muted-foreground">
-          Showing tourist arrivals by nationality
+          Total accommodations: {totalVisitors.toLocaleString()} visitors
         </div>
       </CardFooter>
     </Card>

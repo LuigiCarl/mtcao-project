@@ -88,31 +88,31 @@ export function AreaChartInteractive() {
         <div className="flex gap-2">
           <button
             onClick={() => setTimeRange("7d")}
-            className={`rounded-md px-3 py-1 text-sm font-medium transition-colors ${
+            className={'rounded-md px-3 py-1 text-sm font-medium transition-colors ' + (
               timeRange === "7d"
                 ? "bg-primary text-primary-foreground"
                 : "bg-muted text-muted-foreground hover:bg-muted/80"
-            }`}
+            )}
           >
             7d
           </button>
           <button
             onClick={() => setTimeRange("30d")}
-            className={`rounded-md px-3 py-1 text-sm font-medium transition-colors ${
+            className={'rounded-md px-3 py-1 text-sm font-medium transition-colors ' + (
               timeRange === "30d"
                 ? "bg-primary text-primary-foreground"
                 : "bg-muted text-muted-foreground hover:bg-muted/80"
-            }`}
+            )}
           >
             30d
           </button>
           <button
             onClick={() => setTimeRange("90d")}
-            className={`rounded-md px-3 py-1 text-sm font-medium transition-colors ${
+            className={'rounded-md px-3 py-1 text-sm font-medium transition-colors ' + (
               timeRange === "90d"
                 ? "bg-primary text-primary-foreground"
                 : "bg-muted text-muted-foreground hover:bg-muted/80"
-            }`}
+            )}
           >
             90d
           </button>
@@ -185,9 +185,6 @@ export function AreaChartInteractive() {
             fill="url(#fillMobile)"
             stroke="var(--color-mobile)"
             stackId="a"
-            animationBegin={0}
-            animationDuration={1000}
-            animationEasing="ease-in-out"
           />
           <Area
             dataKey="desktop"
@@ -195,9 +192,6 @@ export function AreaChartInteractive() {
             fill="url(#fillDesktop)"
             stroke="var(--color-desktop)"
             stackId="a"
-            animationBegin={100}
-            animationDuration={1000}
-            animationEasing="ease-in-out"
           />
           <ChartLegend content={<ChartLegendContent />} />
         </AreaChart>

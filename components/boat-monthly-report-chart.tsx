@@ -1,7 +1,7 @@
 "use client"
 
 import { TrendingUp } from "lucide-react"
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Legend, Line, ComposedChart } from "recharts"
+import { Bar, CartesianGrid, XAxis, YAxis, Legend, Line, ComposedChart } from "recharts"
 
 import {
   Card,
@@ -20,56 +20,56 @@ import {
 
 // Sample data showing boat trips per month for each boat
 const monthlyBoatData = [
-  { 
-    month: "May 2025", 
-    "Ocean Explorer": 18, 
-    "Island Hopper": 16, 
-    "Sunset Cruiser": 20, 
+  {
+    month: "May 2025",
+    "Ocean Explorer": 18,
+    "Island Hopper": 16,
+    "Sunset Cruiser": 20,
     "Morning Glory": 15,
     "Sea Breeze": 17,
     total: 86
   },
-  { 
-    month: "Jun 2025", 
-    "Ocean Explorer": 22, 
-    "Island Hopper": 21, 
-    "Sunset Cruiser": 24, 
+  {
+    month: "Jun 2025",
+    "Ocean Explorer": 22,
+    "Island Hopper": 21,
+    "Sunset Cruiser": 24,
     "Morning Glory": 19,
     "Sea Breeze": 20,
     total: 106
   },
-  { 
-    month: "Jul 2025", 
+  {
+    month: "Jul 2025",
     "Ocean Explorer": 26, 
-    "Island Hopper": 25, 
-    "Sunset Cruiser": 28, 
+    "Island Hopper": 25,
+    "Sunset Cruiser": 28,
     "Morning Glory": 23,
     "Sea Breeze": 24,
     total: 126
   },
-  { 
-    month: "Aug 2025", 
-    "Ocean Explorer": 24, 
-    "Island Hopper": 23, 
-    "Sunset Cruiser": 26, 
+  {
+    month: "Aug 2025",
+    "Ocean Explorer": 24,
+    "Island Hopper": 23,
+    "Sunset Cruiser": 26,
     "Morning Glory": 22,
     "Sea Breeze": 23,
     total: 118
   },
-  { 
-    month: "Sep 2025", 
-    "Ocean Explorer": 21, 
-    "Island Hopper": 20, 
-    "Sunset Cruiser": 23, 
+  {
+    month: "Sep 2025",
+    "Ocean Explorer": 21,
+    "Island Hopper": 20,
+    "Sunset Cruiser": 23,
     "Morning Glory": 19,
     "Sea Breeze": 21,
     total: 104
   },
-  { 
-    month: "Oct 2025", 
-    "Ocean Explorer": 19, 
-    "Island Hopper": 18, 
-    "Sunset Cruiser": 21, 
+  {
+    month: "Oct 2025",
+    "Ocean Explorer": 19,
+    "Island Hopper": 18,
+    "Sunset Cruiser": 21,
     "Morning Glory": 17,
     "Sea Breeze": 19,
     total: 94
@@ -135,43 +135,43 @@ export function BoatMonthlyReportChart() {
               content={<ChartTooltipContent indicator="dashed" />}
             />
             <Legend />
-            <Bar 
+            <Bar
               dataKey="Ocean Explorer" 
-              fill="var(--color-Ocean Explorer)" 
-              radius={4} 
+              fill="var(--color-Ocean Explorer)"
+              radius={4}
               stackId="boats"
-              />
-            <Bar 
-              dataKey="Island Hopper" 
-              fill="var(--color-Island Hopper)" 
-              radius={4} 
+            />
+            <Bar
+              dataKey="Island Hopper"
+              fill="var(--color-Island Hopper)"
+              radius={4}
               stackId="boats"
-              />
-            <Bar 
-              dataKey="Sunset Cruiser" 
-              fill="var(--color-Sunset Cruiser)" 
-              radius={4} 
+            />
+            <Bar
+              dataKey="Sunset Cruiser"
+              fill="var(--color-Sunset Cruiser)"
+              radius={4}
               stackId="boats"
-              />
-            <Bar 
-              dataKey="Morning Glory" 
+            />
+            <Bar
+              dataKey="Morning Glory"
               fill="var(--color-Morning Glory)" 
-              radius={4} 
+              radius={4}
               stackId="boats"
-              />
-            <Bar 
-              dataKey="Sea Breeze" 
-              fill="var(--color-Sea Breeze)" 
-              radius={4} 
+            />
+            <Bar
+              dataKey="Sea Breeze"
+              fill="var(--color-Sea Breeze)"
+              radius={4}
               stackId="boats"
-              />
-            <Line 
-              type="monotone" 
-              dataKey="total" 
-              stroke="var(--color-total)" 
+            />
+            <Line
+              type="monotone"
+              dataKey="total"
+              stroke="var(--color-total)"
               strokeWidth={2}
               dot={{ r: 4 }}
-              />
+            />
           </ComposedChart>
         </ChartContainer>
       </CardContent>
@@ -186,4 +186,3 @@ export function BoatMonthlyReportChart() {
     </Card>
   )
 }
-

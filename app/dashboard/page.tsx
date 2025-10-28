@@ -5,6 +5,8 @@ import { BoatDataTable, Boat } from "@/components/boat-data-table"
 import { TouristNationalityChart } from "@/components/tourist-nationality-chart"
 import { PurposeOfVisitChart } from "@/components/purpose-of-visit-chart"
 import { BoatTripTrendChart } from "@/components/boat-trip-trend-chart"
+import { AccommodationTypeChart } from "@/components/accommodation-type-chart"
+import { TouristSpotChart } from "@/components/tourist-spot-chart"
 import { ModeToggle } from "@/components/mode-toggle"
 import {
   Breadcrumb,
@@ -177,13 +179,16 @@ export default function Page() {
             </div>
           </div>
 
-          {/* Charts Row */}
+          {/* Charts Grid - 2x2 plus 1 full width */}
           <div className="grid gap-4 md:grid-cols-2">
             <TouristNationalityChart />
             <PurposeOfVisitChart />
+            <AccommodationTypeChart />
+            <BoatTripTrendChart />
           </div>
 
-          <BoatTripTrendChart />
+          {/* Additional Chart - Full Width */}
+          <TouristSpotChart />
 
           <div className="rounded-xl border bg-card p-6">
             <DataTable />

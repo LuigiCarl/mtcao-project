@@ -83,16 +83,16 @@ export function MonthlyTouristArrivalsChart() {
               content={<ChartTooltipContent indicator="dashed" />}
             />
             <Legend />
-            <Bar 
-              dataKey="foreign" 
-              fill="var(--color-foreign)" 
+            <Bar
+              dataKey="foreign"
+              fill="var(--color-foreign)"
               radius={4}
-              />
-            <Bar 
-              dataKey="domestic" 
-              fill="var(--color-domestic)" 
+            />
+            <Bar
+              dataKey="domestic"
+              fill="var(--color-domestic)"
               radius={4}
-              />
+            />
           </BarChart>
         </ChartContainer>
       </CardContent>
@@ -109,10 +109,9 @@ export function MonthlyTouristArrivalsChart() {
           )}
         </div>
         <div className="leading-none text-muted-foreground">
-          Total arrivals across all months: {monthlyData.reduce((sum, m) => sum + m.total, 0).toLocaleString()}
+          Total arrivals across all months: {monthlyData.reduce((sum, m) => sum + m.total, 0).toLocaleString()}    
         </div>
       </CardFooter>
     </Card>
   )
 }
-

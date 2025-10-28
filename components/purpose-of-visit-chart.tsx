@@ -77,8 +77,6 @@ export function PurposeOfVisitChart() {
               nameKey="purpose"
               innerRadius={60}
               strokeWidth={5}
-              animationDuration={800}
-              animationBegin={0}
             >
               <Label
                 content={({ viewBox }) => {
@@ -102,7 +100,7 @@ export function PurposeOfVisitChart() {
                           y={(viewBox.cy || 0) + 24}
                           className="fill-muted-foreground"
                         >
-                          Total Visitors
+                          Visitors
                         </tspan>
                       </text>
                     )
@@ -115,10 +113,10 @@ export function PurposeOfVisitChart() {
       </CardContent>
       <CardFooter className="flex-col gap-2 text-sm">
         <div className="flex items-center gap-2 font-medium leading-none">
-          Leisure tourism up 8.3% this quarter <TrendingUp className="h-4 w-4" />
+          Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
         </div>
         <div className="leading-none text-muted-foreground">
-          Showing visitor distribution by purpose
+          Showing total visitors by purpose
         </div>
       </CardFooter>
     </Card>
