@@ -33,6 +33,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { useBoats } from "@/hooks/use-api"
+import { Skeleton } from "@/components/ui/skeleton"
 
 export type Boat = {
   id: string
@@ -49,6 +51,7 @@ export type Boat = {
   engineHorsePower?: string
   yearBuilt?: string
   notes?: string
+  status?: string
 }
 
 export const columns: ColumnDef<Boat>[] = [
@@ -138,17 +141,43 @@ export const columns: ColumnDef<Boat>[] = [
 ]
 
 interface BoatDataTableProps {
-  data: Boat[]
+  data?: Boat[]
 }
 
-export function BoatDataTable({ data }: BoatDataTableProps) {
+export function BoatDataTable({ data: propData }: BoatDataTableProps) {
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = React.useState({})
 
+  // Fetch from API if no data prop is provided
+  const { boats: apiBoats, loading, error } = useBoats()
+
+  // Transform API data to match Boat type
+  const transformedData: Boat[] = React.useMemo(() => {
+    const sourceData = propData || apiBoats || []
+    
+    return sourceData.map((boat: any): Boat => ({
+      id: String(boat.id),
+      boatName: boat.boat_name || boat.boatName || '',
+      registrationNumber: boat.registration_number || boat.registrationNumber || '',
+      boatType: boat.boat_type || boat.boatType || '',
+      capacity: String(boat.capacity || ''),
+      operatorName: boat.operator_name || boat.operatorName || '',
+      operatorContact: boat.operator_contact || boat.operatorContact || '',
+      captainName: boat.captain_name || boat.captainName || '',
+      captainLicense: boat.captain_license || boat.captainLicense || '',
+      homePort: boat.home_port || boat.homePort || '',
+      engineType: boat.engine_type || boat.engineType,
+      engineHorsePower: boat.engine_horsepower || boat.engineHorsePower,
+      yearBuilt: String(boat.year_built || boat.yearBuilt || ''),
+      status: boat.status,
+      notes: boat.notes,
+    }))
+  }, [propData, apiBoats])
+
   const table = useReactTable({
-    data,
+    data: transformedData,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -165,6 +194,25 @@ export function BoatDataTable({ data }: BoatDataTableProps) {
       rowSelection,
     },
   })
+
+  // Show loading state
+  if (!propData && loading) {
+    return (
+      <div className="w-full space-y-4">
+        <Skeleton className="h-10 w-full" />
+        <Skeleton className="h-64 w-full" />
+      </div>
+    )
+  }
+
+  // Show error state
+  if (!propData && error) {
+    return (
+      <div className="w-full rounded-md border p-8 text-center">
+        <p className="text-destructive">Error loading boats: {error}</p>
+      </div>
+    )
+  }
 
   return (
     <div className="w-full">

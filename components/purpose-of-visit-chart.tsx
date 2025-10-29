@@ -18,14 +18,6 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart"
 
-const chartData = [
-  { purpose: "Leisure", visitors: 1850, fill: "var(--color-leisure)" },
-  { purpose: "Business", visitors: 420, fill: "var(--color-business)" },
-  { purpose: "Education", visitors: 180, fill: "var(--color-education)" },
-  { purpose: "Official", visitors: 95, fill: "var(--color-official)" },
-  { purpose: "Others", visitors: 215, fill: "var(--color-others)" },
-]
-
 const chartConfig = {
   visitors: {
     label: "Visitors",
@@ -52,7 +44,28 @@ const chartConfig = {
   },
 } satisfies ChartConfig
 
-export function PurposeOfVisitChart() {
+interface PurposeOfVisitChartProps {
+  data?: any[]
+}
+
+export function PurposeOfVisitChart({ data }: PurposeOfVisitChartProps) {
+  // Transform API data or use fallback
+  const chartData = data?.map((item: any) => {
+    const purpose = item.purpose?.charAt(0).toUpperCase() + item.purpose?.slice(1) || 'Others'
+    const configKey = purpose.toLowerCase() as keyof typeof chartConfig
+    return {
+      purpose: purpose,
+      visitors: item.visitors || 0,
+      fill: `var(--color-${configKey})`,
+    }
+  }) || [
+    { purpose: "Leisure", visitors: 1850, fill: "var(--color-leisure)" },
+    { purpose: "Business", visitors: 420, fill: "var(--color-business)" },
+    { purpose: "Education", visitors: 180, fill: "var(--color-education)" },
+    { purpose: "Official", visitors: 95, fill: "var(--color-official)" },
+    { purpose: "Others", visitors: 215, fill: "var(--color-others)" },
+  ]
+
   const totalVisitors = chartData.reduce((acc, curr) => acc + curr.visitors, 0)
 
   const CustomLegend = () => (

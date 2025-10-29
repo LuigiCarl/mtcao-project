@@ -18,12 +18,6 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart"
 
-const chartData = [
-  { type: "Day Tour", visitors: 1240, fill: "hsl(142, 76%, 36%)" },
-  { type: "Overnight", visitors: 890, fill: "hsl(221, 83%, 53%)" },
-  { type: "Staycation", visitors: 630, fill: "hsl(280, 65%, 60%)" },
-]
-
 const chartConfig = {
   visitors: {
     label: "Visitors",
@@ -42,7 +36,34 @@ const chartConfig = {
   },
 } satisfies ChartConfig
 
-export function AccommodationTypeChart() {
+interface AccommodationTypeChartProps {
+  data?: any[]
+}
+
+export function AccommodationTypeChart({ data }: AccommodationTypeChartProps) {
+  // Transform API data or use fallback
+  const chartData = data?.map((item: any) => {
+    const type = item.accommodation_type?.split('_').map((word: string) => 
+      word.charAt(0).toUpperCase() + word.slice(1)
+    ).join(' ') || 'Unknown'
+    
+    const colorMap: Record<string, string> = {
+      'Day Tour': 'hsl(142, 76%, 36%)',
+      'Overnight': 'hsl(221, 83%, 53%)',
+      'Staycation': 'hsl(280, 65%, 60%)',
+    }
+    
+    return {
+      type,
+      visitors: item.visitors || 0,
+      fill: colorMap[type] || 'hsl(0, 0%, 50%)',
+    }
+  }) || [
+    { type: "Day Tour", visitors: 1240, fill: "hsl(142, 76%, 36%)" },
+    { type: "Overnight", visitors: 890, fill: "hsl(221, 83%, 53%)" },
+    { type: "Staycation", visitors: 630, fill: "hsl(280, 65%, 60%)" },
+  ]
+
   const totalVisitors = chartData.reduce((acc, curr) => acc + curr.visitors, 0)
 
   return (

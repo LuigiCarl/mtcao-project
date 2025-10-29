@@ -18,12 +18,6 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart"
 
-const chartData = [
-  { spot: "Juag Lagoon", visitors: 1450, fill: "hsl(199, 89%, 48%)" },
-  { spot: "Cave", visitors: 980, fill: "hsl(30, 80%, 55%)" },
-  { spot: "Beach", visitors: 1620, fill: "hsl(45, 93%, 58%)" },
-]
-
 const chartConfig = {
   visitors: {
     label: "Visitors",
@@ -40,11 +34,44 @@ const chartConfig = {
     label: "Beach",
     color: "hsl(45, 93%, 58%)",
   },
+  divingSpot: {
+    label: "Diving Spot",
+    color: "hsl(280, 65%, 60%)",
+  },
+  islandTour: {
+    label: "Island Tour",
+    color: "hsl(142, 76%, 36%)",
+  },
 } satisfies ChartConfig
 
-export function TouristSpotChart() {
+interface TouristSpotChartProps {
+  data?: any[]
+}
+
+export function TouristSpotChart({ data }: TouristSpotChartProps) {
+  // Transform API data or use fallback
+  const colorMap: Record<string, string> = {
+    'Juag Lagoon': 'hsl(199, 89%, 48%)',
+    'Cave': 'hsl(30, 80%, 55%)',
+    'Beach': 'hsl(45, 93%, 58%)',
+    'Diving Spot': 'hsl(280, 65%, 60%)',
+    'Island Tour': 'hsl(142, 76%, 36%)',
+  }
+  
+  const chartData = data?.map((item: any) => ({
+    spot: item.destination || item.spot,
+    visitors: item.visitors || item.count || 0,
+    fill: colorMap[item.destination || item.spot] || 'hsl(0, 0%, 50%)',
+  })) || [
+    { spot: "Beach", visitors: 1620, fill: "hsl(45, 93%, 58%)" },
+    { spot: "Juag Lagoon", visitors: 1450, fill: "hsl(199, 89%, 48%)" },
+    { spot: "Cave", visitors: 980, fill: "hsl(30, 80%, 55%)" },
+  ]
+
   const totalVisitors = chartData.reduce((acc, curr) => acc + curr.visitors, 0)
-  const mostPopular = chartData.reduce((max, curr) => curr.visitors > max.visitors ? curr : max)
+  const mostPopular = chartData.length > 0 
+    ? chartData.reduce((max, curr) => curr.visitors > max.visitors ? curr : max)
+    : null
 
   return (
     <Card className="flex flex-col h-full min-h-[500px]">
@@ -89,7 +116,11 @@ export function TouristSpotChart() {
       </CardContent>
       <CardFooter className="flex-col items-start gap-2 text-sm">
         <div className="flex gap-2 font-medium leading-none">
-          {mostPopular.spot} is most popular <TrendingUp className="h-4 w-4" />
+          {mostPopular ? (
+            <>{mostPopular.spot} is most popular <TrendingUp className="h-4 w-4" /></>
+          ) : (
+            <>No data available for selected period</>
+          )}
         </div>
         <div className="leading-none text-muted-foreground">
           Total spot visits: {totalVisitors.toLocaleString()} visitors

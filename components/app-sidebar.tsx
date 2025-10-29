@@ -66,24 +66,6 @@ const data = {
       ],
     },
     {
-      title: "Settings",
-      url: "#",
-      items: [
-        {
-          title: "User Management",
-          url: "#",
-          icon: Users,
-          badge: "Coming Soon",
-        },
-        {
-          title: "Preferences",
-          url: "#",
-          icon: Settings,
-          badge: "Coming Soon",
-        },
-      ],
-    },
-    {
       title: "System",
       url: "#",
       items: [
@@ -91,6 +73,11 @@ const data = {
           title: "System Information",
           url: "/system",
           icon: Info,
+        },
+        {
+          title: "Settings",
+          url: "/system/settings",
+          icon: Settings,
         },
       ],
     },

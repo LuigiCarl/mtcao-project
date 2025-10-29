@@ -9,21 +9,42 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { Button } from "@/components/ui/button"
 import { SearchInput } from "@/components/search-input"
+import { useTrips } from "@/hooks/use-api"
+import { Skeleton } from "@/components/ui/skeleton"
+import { ChevronLeft, ChevronRight } from "lucide-react"
 
-const data = [
-  { id: "BT-001", date: "Oct 28, 2025", boatName: "Sea Explorer", operator: "Blue Wave Co.", tourists: 8, foreign: 6, purpose: "Leisure" },
-  { id: "BT-002", date: "Oct 27, 2025", boatName: "Ocean Dream", operator: "Marine Tours", tourists: 10, foreign: 8, purpose: "Leisure" },
-  { id: "BT-003", date: "Oct 27, 2025", boatName: "Island Hopper", operator: "Paradise Boats", tourists: 6, foreign: 2, purpose: "Business" },
-  { id: "BT-004", date: "Oct 26, 2025", boatName: "Coral Queen", operator: "Blue Wave Co.", tourists: 9, foreign: 7, purpose: "Leisure" },
-  { id: "BT-005", date: "Oct 26, 2025", boatName: "Wave Rider", operator: "Coast Marine", tourists: 5, foreign: 5, purpose: "Education" },
-  { id: "BT-006", date: "Oct 25, 2025", boatName: "Sun Seeker", operator: "Marine Tours", tourists: 7, foreign: 4, purpose: "Leisure" },
-  { id: "BT-007", date: "Oct 25, 2025", boatName: "Blue Horizon", operator: "Ocean Adventures", tourists: 10, foreign: 9, purpose: "Leisure" },
-  { id: "BT-008", date: "Oct 24, 2025", boatName: "Sea Breeze", operator: "Paradise Boats", tourists: 8, foreign: 6, purpose: "Official" },
-]
+interface DataTableProps {
+  month?: string
+  year?: string
+}
 
-export function DataTable() {
+export function DataTable({ month, year }: DataTableProps = {}) {
   const [searchQuery, setSearchQuery] = React.useState("")
+  const [currentPage, setCurrentPage] = React.useState(1)
+  const itemsPerPage = 10
+  const { trips, loading, error } = useTrips(month, year)
+
+  // Transform API data to match table format
+  const data = React.useMemo(() => {
+    if (!trips) return []
+    
+    return trips.map((trip: any) => ({
+      id: `BT-${String(trip.id).padStart(3, '0')}`,
+      date: new Date(trip.trip_date).toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'short', 
+        day: 'numeric' 
+      }),
+      boatName: trip.boat?.boat_name || 'N/A',
+      operator: trip.boat?.operator_name || 'N/A',
+      tourists: trip.passengers_count,
+      destination: trip.destination,
+      status: trip.status,
+      tripType: trip.trip_type,
+    }))
+  }, [trips])
 
   const filteredData = data.filter((row) => {
     const searchLower = searchQuery.toLowerCase()
@@ -31,18 +52,37 @@ export function DataTable() {
       row.id.toLowerCase().includes(searchLower) ||
       row.boatName.toLowerCase().includes(searchLower) ||
       row.operator.toLowerCase().includes(searchLower) ||
-      row.purpose.toLowerCase().includes(searchLower) ||
+      row.destination.toLowerCase().includes(searchLower) ||
       row.date.toLowerCase().includes(searchLower)
     )
   })
+
+  // Reset to page 1 when search changes
+  React.useEffect(() => {
+    setCurrentPage(1)
+  }, [searchQuery])
+
+  // Calculate pagination
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage)
+  const startIndex = (currentPage - 1) * itemsPerPage
+  const endIndex = startIndex + itemsPerPage
+  const paginatedData = filteredData.slice(startIndex, endIndex)
+
+  const handlePreviousPage = () => {
+    setCurrentPage((prev) => Math.max(prev - 1, 1))
+  }
+
+  const handleNextPage = () => {
+    setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+  }
 
   return (
     <div className="w-full">
       <div className="pb-4 flex items-center justify-between">
         <div>
-          <h3 className="text-lg font-semibold">Recent Boat Transactions</h3>
+          <h3 className="text-lg font-semibold">Recent Boat Trips</h3>
           <p className="text-sm text-muted-foreground">
-            Latest boat trips and tourist entries recorded in the system.
+            Latest boat trips recorded in the system.
           </p>
         </div>
         <SearchInput 
@@ -51,56 +91,105 @@ export function DataTable() {
           placeholder="Search trips..."
         />
       </div>
-      <div className="rounded-md border">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Trip ID</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead>Boat Name</TableHead>
-              <TableHead>Operator</TableHead>
-              <TableHead className="text-center">Tourists</TableHead>
-              <TableHead className="text-center">Foreign</TableHead>
-              <TableHead>Purpose</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredData.length === 0 ? (
+      {loading ? (
+        <div className="space-y-2">
+          <Skeleton className="h-12 w-full" />
+          <Skeleton className="h-12 w-full" />
+          <Skeleton className="h-12 w-full" />
+          <Skeleton className="h-12 w-full" />
+        </div>
+      ) : error ? (
+        <div className="rounded-md border p-8 text-center">
+          <p className="text-destructive">Error loading trips: {error}</p>
+        </div>
+      ) : (
+        <div className="rounded-md border">
+          <Table>
+            <TableHeader>
               <TableRow>
-                <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
-                  No results found for "{searchQuery}"
-                </TableCell>
+                <TableHead>Trip ID</TableHead>
+                <TableHead>Date</TableHead>
+                <TableHead>Boat Name</TableHead>
+                <TableHead>Operator</TableHead>
+                <TableHead>Destination</TableHead>
+                <TableHead className="text-center">Passengers</TableHead>
+                <TableHead>Type</TableHead>
+                <TableHead>Status</TableHead>
               </TableRow>
-            ) : (
-              filteredData.map((row) => (
-              <TableRow key={row.id}>
-                <TableCell className="font-medium">{row.id}</TableCell>
-                <TableCell>{row.date}</TableCell>
-                <TableCell>{row.boatName}</TableCell>
-                <TableCell>{row.operator}</TableCell>
-                <TableCell className="text-center">{row.tourists}</TableCell>
-                <TableCell className="text-center">{row.foreign}</TableCell>
-                <TableCell>
-                  <span
-                    className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${
-                      row.purpose === "Leisure"
-                        ? "bg-green-100 text-green-800"
-                        : row.purpose === "Business"
-                        ? "bg-blue-100 text-blue-800"
-                        : row.purpose === "Education"
-                        ? "bg-purple-100 text-purple-800"
-                        : "bg-orange-100 text-orange-800"
-                    }`}
-                  >
-                    {row.purpose}
-                  </span>
-                </TableCell>
-              </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </div>
+            </TableHeader>
+            <TableBody>
+              {paginatedData.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={8} className="text-center text-muted-foreground py-8">
+                    {searchQuery ? `No results found for "${searchQuery}"` : "No trips available"}
+                  </TableCell>
+                </TableRow>
+              ) : (
+                paginatedData.map((row) => (
+                  <TableRow key={row.id}>
+                    <TableCell className="font-medium">{row.id}</TableCell>
+                    <TableCell>{row.date}</TableCell>
+                    <TableCell>{row.boatName}</TableCell>
+                    <TableCell>{row.operator}</TableCell>
+                    <TableCell>{row.destination}</TableCell>
+                    <TableCell className="text-center">{row.tourists}</TableCell>
+                    <TableCell>
+                      <span className="inline-flex rounded-full px-2 py-1 text-xs font-semibold bg-blue-100 text-blue-800 capitalize">
+                        {row.tripType}
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      <span
+                        className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold capitalize ${
+                          row.status === "completed"
+                            ? "bg-green-100 text-green-800"
+                            : row.status === "pending"
+                            ? "bg-yellow-100 text-yellow-800"
+                            : "bg-gray-100 text-gray-800"
+                        }`}
+                      >
+                        {row.status}
+                      </span>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+          
+          {/* Pagination Controls */}
+          {filteredData.length > 0 && (
+            <div className="flex items-center justify-between px-4 py-4 border-t">
+              <div className="text-sm text-muted-foreground">
+                Showing {startIndex + 1} to {Math.min(endIndex, filteredData.length)} of {filteredData.length} trips
+              </div>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handlePreviousPage}
+                  disabled={currentPage === 1}
+                >
+                  <ChevronLeft className="h-4 w-4 mr-1" />
+                  Previous
+                </Button>
+                <div className="text-sm font-medium">
+                  Page {currentPage} of {totalPages}
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleNextPage}
+                  disabled={currentPage === totalPages}
+                >
+                  Next
+                  <ChevronRight className="h-4 w-4 ml-1" />
+                </Button>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   )
 }

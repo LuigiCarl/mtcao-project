@@ -18,15 +18,6 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart"
 
-const chartData = [
-  { nationality: "Philippines", foreign: 320, domestic: 850, total: 1170 },
-  { nationality: "Korea", foreign: 450, domestic: 120, total: 570 },
-  { nationality: "USA", foreign: 380, domestic: 80, total: 460 },
-  { nationality: "Japan", foreign: 290, domestic: 60, total: 350 },
-  { nationality: "China", foreign: 240, domestic: 50, total: 290 },
-  { nationality: "Others", foreign: 180, domestic: 140, total: 320 },
-]
-
 const chartConfig = {
   foreign: {
     label: "Foreign",
@@ -38,7 +29,25 @@ const chartConfig = {
   },
 } satisfies ChartConfig
 
-export function TouristNationalityChart() {
+interface TouristNationalityChartProps {
+  data?: any[]
+}
+
+export function TouristNationalityChart({ data }: TouristNationalityChartProps) {
+  // Transform API data or use fallback
+  const chartData = data?.map((item: any) => ({
+    nationality: item.nationality,
+    foreign: item.foreign || 0,
+    domestic: item.domestic || 0,
+    total: item.total || (item.foreign + item.domestic) || 0,
+  })) || [
+    { nationality: "Philippines", foreign: 320, domestic: 850, total: 1170 },
+    { nationality: "Korea", foreign: 450, domestic: 120, total: 570 },
+    { nationality: "USA", foreign: 380, domestic: 80, total: 460 },
+    { nationality: "Japan", foreign: 290, domestic: 60, total: 350 },
+    { nationality: "China", foreign: 240, domestic: 50, total: 290 },
+  ]
+
   return (
     <Card className="flex flex-col h-full min-h-[500px]">
       <CardHeader>

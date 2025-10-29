@@ -20,15 +20,6 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart"
 
-const chartData = [
-  { month: "January", trips: 186, passengers: 1420 },
-  { month: "February", trips: 305, passengers: 2380 },
-  { month: "March", trips: 237, passengers: 1850 },
-  { month: "April", trips: 273, passengers: 2140 },
-  { month: "May", trips: 209, passengers: 1620 },
-  { month: "June", trips: 214, passengers: 1690 },
-]
-
 const chartConfig = {
   trips: {
     label: "Trips",
@@ -40,12 +31,37 @@ const chartConfig = {
   },
 } satisfies ChartConfig
 
-export function BoatTripTrendChart() {
+const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+
+interface BoatTripTrendChartProps {
+  data?: any[]
+}
+
+export function BoatTripTrendChart({ data }: BoatTripTrendChartProps) {
+  // Transform API data or use fallback
+  const chartData = data?.map((item: any) => ({
+    month: monthNames[item.month - 1] || `Month ${item.month}`,
+    trips: parseInt(item.trips) || 0,
+    passengers: parseInt(item.passengers) || 0,
+  })) || [
+    { month: "January", trips: 186, passengers: 1420 },
+    { month: "February", trips: 305, passengers: 2380 },
+    { month: "March", trips: 237, passengers: 1850 },
+    { month: "April", trips: 273, passengers: 2140 },
+    { month: "May", trips: 209, passengers: 1620 },
+    { month: "June", trips: 214, passengers: 1690 },
+  ]
+
+  // Get date range for description
+  const dateRange = data && data.length > 0 
+    ? `${monthNames[data[0].month - 1]} - ${monthNames[data[data.length - 1].month - 1]} 2025`
+    : "January - June 2024"
+
   return (
     <Card className="flex flex-col h-full min-h-[500px]">
       <CardHeader>
         <CardTitle>Boat Trip Trends</CardTitle>
-        <CardDescription>January - June 2024</CardDescription>
+        <CardDescription>{dateRange}</CardDescription>
       </CardHeader>
       <CardContent className="flex-1">
         <ChartContainer config={chartConfig} className="h-full w-full min-h-[300px] aspect-auto">
