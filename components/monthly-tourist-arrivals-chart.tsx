@@ -2,6 +2,7 @@
 
 import { TrendingUp } from "lucide-react"
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Legend } from "recharts"
+import { useEffect, useState } from "react"
 
 import {
   Card,
@@ -17,22 +18,6 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart"
-
-// Sample data for monthly tourist arrivals over the past year
-const monthlyData = [
-  { month: "Nov 2024", foreign: 1240, domestic: 680, total: 1920 },
-  { month: "Dec 2024", foreign: 1560, domestic: 920, total: 2480 },
-  { month: "Jan 2025", foreign: 1840, domestic: 1150, total: 2990 },
-  { month: "Feb 2025", foreign: 1680, domestic: 980, total: 2660 },
-  { month: "Mar 2025", foreign: 2120, domestic: 1280, total: 3400 },
-  { month: "Apr 2025", foreign: 1980, domestic: 1090, total: 3070 },
-  { month: "May 2025", foreign: 2340, domestic: 1420, total: 3760 },
-  { month: "Jun 2025", foreign: 2580, domestic: 1620, total: 4200 },
-  { month: "Jul 2025", foreign: 2890, domestic: 1840, total: 4730 },
-  { month: "Aug 2025", foreign: 2760, domestic: 1720, total: 4480 },
-  { month: "Sep 2025", foreign: 2450, domestic: 1520, total: 3970 },
-  { month: "Oct 2025", foreign: 2180, domestic: 1340, total: 3520 },
-]
 
 const chartConfig = {
   foreign: {
@@ -50,9 +35,49 @@ const chartConfig = {
 } satisfies ChartConfig
 
 export function MonthlyTouristArrivalsChart() {
+  const [monthlyData, setMonthlyData] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const response = await fetch('http://127.0.0.1:8000/api/reports/monthly-tourist-arrivals')
+        const data = await response.json()
+        setMonthlyData(data)
+      } catch (error) {
+        console.error('Error fetching monthly tourist data:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchData()
+  }, [])
+
+  if (loading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Monthly Tourist Arrivals</CardTitle>
+          <CardDescription>Loading...</CardDescription>
+        </CardHeader>
+      </Card>
+    )
+  }
+
+  if (monthlyData.length === 0) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Monthly Tourist Arrivals</CardTitle>
+          <CardDescription>No data available</CardDescription>
+        </CardHeader>
+      </Card>
+    )
+  }
+
   // Calculate year-over-year growth
-  const currentMonthTotal = monthlyData[monthlyData.length - 1].total
-  const previousYearTotal = monthlyData[0].total
+  const currentMonthTotal = monthlyData[monthlyData.length - 1]?.total || 0
+  const previousYearTotal = monthlyData[0]?.total || 1
   const growthPercentage = ((currentMonthTotal - previousYearTotal) / previousYearTotal * 100).toFixed(1)
 
   return (

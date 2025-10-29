@@ -10,6 +10,8 @@ import {
   Info,
   BarChart3,
   Users,
+  Ship,
+  Activity,
 } from "lucide-react"
 
 import { SearchForm } from "@/components/search-form"
@@ -50,6 +52,17 @@ const data = {
       ],
     },
     {
+      title: "Real-Time Monitoring",
+      url: "#",
+      items: [
+        {
+          title: "Monitoring Dashboard",
+          url: "/monitoring",
+          icon: Activity,
+        },
+      ],
+    },
+    {
       title: "Reports and Analytics",
       url: "#",
       items: [
@@ -57,11 +70,6 @@ const data = {
           title: "Monthly Reports",
           url: "/reports",
           icon: FileText,
-        },
-        {
-          title: "Boat Reports",
-          url: "/reports/boats",
-          icon: Database,
         },
       ],
     },

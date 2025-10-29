@@ -2,6 +2,7 @@
 
 import { TrendingUp } from "lucide-react"
 import { Bar, CartesianGrid, XAxis, YAxis, Legend, Line, ComposedChart } from "recharts"
+import { useEffect, useState } from "react"
 
 import {
   Card,
@@ -18,95 +19,94 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart"
 
-// Sample data showing boat trips per month for each boat
-const monthlyBoatData = [
-  {
-    month: "May 2025",
-    "Ocean Explorer": 18,
-    "Island Hopper": 16,
-    "Sunset Cruiser": 20,
-    "Morning Glory": 15,
-    "Sea Breeze": 17,
-    total: 86
-  },
-  {
-    month: "Jun 2025",
-    "Ocean Explorer": 22,
-    "Island Hopper": 21,
-    "Sunset Cruiser": 24,
-    "Morning Glory": 19,
-    "Sea Breeze": 20,
-    total: 106
-  },
-  {
-    month: "Jul 2025",
-    "Ocean Explorer": 26, 
-    "Island Hopper": 25,
-    "Sunset Cruiser": 28,
-    "Morning Glory": 23,
-    "Sea Breeze": 24,
-    total: 126
-  },
-  {
-    month: "Aug 2025",
-    "Ocean Explorer": 24,
-    "Island Hopper": 23,
-    "Sunset Cruiser": 26,
-    "Morning Glory": 22,
-    "Sea Breeze": 23,
-    total: 118
-  },
-  {
-    month: "Sep 2025",
-    "Ocean Explorer": 21,
-    "Island Hopper": 20,
-    "Sunset Cruiser": 23,
-    "Morning Glory": 19,
-    "Sea Breeze": 21,
-    total: 104
-  },
-  {
-    month: "Oct 2025",
-    "Ocean Explorer": 19,
-    "Island Hopper": 18,
-    "Sunset Cruiser": 21,
-    "Morning Glory": 17,
-    "Sea Breeze": 19,
-    total: 94
-  },
+// Default colors for boats
+const defaultColors = [
+  "hsl(221, 83%, 53%)",
+  "hsl(142, 76%, 36%)",
+  "hsl(280, 65%, 60%)",
+  "hsl(24, 95%, 53%)",
+  "hsl(173, 58%, 39%)",
 ]
 
-const chartConfig = {
-  "Ocean Explorer": {
-    label: "Ocean Explorer",
-    color: "hsl(221, 83%, 53%)",
-  },
-  "Island Hopper": {
-    label: "Island Hopper",
-    color: "hsl(142, 76%, 36%)",
-  },
-  "Sunset Cruiser": {
-    label: "Sunset Cruiser",
-    color: "hsl(280, 65%, 60%)",
-  },
-  "Morning Glory": {
-    label: "Morning Glory",
-    color: "hsl(24, 95%, 53%)",
-  },
-  "Sea Breeze": {
-    label: "Sea Breeze",
-    color: "hsl(173, 58%, 39%)",
-  },
-  total: {
-    label: "Total Trips",
-    color: "hsl(0, 0%, 50%)",
-  },
-} satisfies ChartConfig
-
 export function BoatMonthlyReportChart() {
+  const [monthlyBoatData, setMonthlyBoatData] = useState<any[]>([])
+  const [chartConfig, setChartConfig] = useState<ChartConfig>({
+    total: {
+      label: "Total Trips",
+      color: "hsl(0, 0%, 50%)",
+    },
+  })
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const response = await fetch('http://127.0.0.1:8000/api/reports/monthly-boat-trips')
+        const data = await response.json()
+        
+        // Extract unique boat names and create config
+        const boatNames = new Set<string>()
+        data.forEach((month: any) => {
+          Object.keys(month).forEach(key => {
+            if (key !== 'month' && key !== 'total') {
+              boatNames.add(key)
+            }
+          })
+        })
+
+        // Create chart config for each boat
+        const config: ChartConfig = {
+          total: {
+            label: "Total Trips",
+            color: "hsl(0, 0%, 50%)",
+          },
+        }
+        Array.from(boatNames).forEach((boatName, index) => {
+          config[boatName] = {
+            label: boatName,
+            color: defaultColors[index % defaultColors.length],
+          }
+        })
+
+        setChartConfig(config)
+        setMonthlyBoatData(data)
+      } catch (error) {
+        console.error('Error fetching monthly boat data:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchData()
+  }, [])
+
+  if (loading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Boat Rotation Performance</CardTitle>
+          <CardDescription>Loading...</CardDescription>
+        </CardHeader>
+      </Card>
+    )
+  }
+
+  if (monthlyBoatData.length === 0) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Boat Rotation Performance</CardTitle>
+          <CardDescription>No data available</CardDescription>
+        </CardHeader>
+      </Card>
+    )
+  }
+
   // Calculate average trips per boat
-  const totalTrips = monthlyBoatData.reduce((sum, month) => sum + month.total, 0)
+  const totalTrips = monthlyBoatData.reduce((sum, month) => sum + (month.total || 0), 0)
   const avgTripsPerMonth = (totalTrips / monthlyBoatData.length).toFixed(1)
+
+  // Get boat names (excluding month and total)
+  const boatNames = Object.keys(chartConfig).filter(key => key !== 'total')
 
   return (
     <Card>
@@ -135,36 +135,15 @@ export function BoatMonthlyReportChart() {
               content={<ChartTooltipContent indicator="dashed" />}
             />
             <Legend />
-            <Bar
-              dataKey="Ocean Explorer" 
-              fill="var(--color-Ocean Explorer)"
-              radius={4}
-              stackId="boats"
-            />
-            <Bar
-              dataKey="Island Hopper"
-              fill="var(--color-Island Hopper)"
-              radius={4}
-              stackId="boats"
-            />
-            <Bar
-              dataKey="Sunset Cruiser"
-              fill="var(--color-Sunset Cruiser)"
-              radius={4}
-              stackId="boats"
-            />
-            <Bar
-              dataKey="Morning Glory"
-              fill="var(--color-Morning Glory)" 
-              radius={4}
-              stackId="boats"
-            />
-            <Bar
-              dataKey="Sea Breeze"
-              fill="var(--color-Sea Breeze)"
-              radius={4}
-              stackId="boats"
-            />
+            {boatNames.map((boatName) => (
+              <Bar
+                key={boatName}
+                dataKey={boatName}
+                fill={`var(--color-${boatName})`}
+                radius={4}
+                stackId="boats"
+              />
+            ))}
             <Line
               type="monotone"
               dataKey="total"
@@ -180,7 +159,7 @@ export function BoatMonthlyReportChart() {
           Fair rotation maintained across all boats <TrendingUp className="h-4 w-4" />
         </div>
         <div className="leading-none text-muted-foreground">
-          Average {avgTripsPerMonth} total trips per month • {totalTrips} total trips across 6 months
+          Average {avgTripsPerMonth} total trips per month • {totalTrips} total trips across all months
         </div>
       </CardFooter>
     </Card>

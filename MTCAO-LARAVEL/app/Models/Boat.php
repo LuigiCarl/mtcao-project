@@ -21,11 +21,19 @@ class Boat extends Model
         'engine_horsepower',
         'year_built',
         'status',
+        'current_cycle',
+        'cycle_position',
+        'has_trip_in_cycle',
+        'last_trip_date',
     ];
 
     protected $casts = [
         'capacity' => 'integer',
         'year_built' => 'integer',
+        'current_cycle' => 'integer',
+        'cycle_position' => 'integer',
+        'has_trip_in_cycle' => 'boolean',
+        'last_trip_date' => 'datetime',
     ];
 
     public function trips(): HasMany

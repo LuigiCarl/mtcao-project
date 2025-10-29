@@ -169,3 +169,57 @@ export function useDashboardStats(month?: string, year?: string) {
 
   return { stats, loading, error };
 }
+
+export function useSettings() {
+  const [settings, setSettings] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetchSettings();
+  }, []);
+
+  const fetchSettings = async () => {
+    try {
+      setLoading(true);
+      const data = await apiClient.get('/settings');
+      setSettings(data);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const updateSettings = async (settingsData: any[]) => {
+    try {
+      const response = await apiClient.put('/settings', { settings: settingsData });
+      setSettings(response.settings);
+      return response;
+    } catch (err: any) {
+      throw new Error(err.message);
+    }
+  };
+
+  const updateSingleSetting = async (key: string, value: any, type: string = 'string', group: string = 'general') => {
+    try {
+      const response = await apiClient.put('/settings/single', { key, value, type, group });
+      await fetchSettings(); // Refresh settings
+      return response;
+    } catch (err: any) {
+      throw new Error(err.message);
+    }
+  };
+
+  const resetSettings = async () => {
+    try {
+      const response = await apiClient.post('/settings/reset', {});
+      setSettings(response.settings);
+      return response;
+    } catch (err: any) {
+      throw new Error(err.message);
+    }
+  };
+
+  return { settings, loading, error, updateSettings, updateSingleSetting, resetSettings, refetch: fetchSettings };
+}
