@@ -151,16 +151,16 @@ export default function Page() {
             </div>
           ) : (
             <>
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+              <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
                 {/* Total Tourists Card */}
-                <div className="rounded-xl border bg-card p-6">
+                <div className="rounded-xl border bg-card p-4 md:p-5 lg:p-6">
                   <div className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <p className="text-sm font-medium text-muted-foreground">Trip Passengers</p>
+                    <p className="text-xs sm:text-sm font-medium text-muted-foreground">Trip Passengers</p>
                     <Users className="h-4 w-4 text-muted-foreground" />
                   </div>
                   <div className="flex flex-col gap-1">
-                    <p className="text-3xl font-bold">{stats?.summary?.total_trip_passengers?.toLocaleString() || '0'}</p>
-                    <div className="flex items-center gap-2 text-sm">
+                    <p className="text-2xl sm:text-3xl font-bold">{stats?.summary?.total_trip_passengers?.toLocaleString() || '0'}</p>
+                    <div className="flex items-center gap-2 text-xs sm:text-sm">
                       <span className="text-muted-foreground">
                         {stats?.summary?.total_tourists || 0} registered tourists
                       </span>
@@ -169,14 +169,14 @@ export default function Page() {
                 </div>
 
                 {/* Boat Trips Card */}
-                <div className="rounded-xl border bg-card p-6">
+                <div className="rounded-xl border bg-card p-4 md:p-5 lg:p-6">
                   <div className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <p className="text-sm font-medium text-muted-foreground">Total Trips</p>
+                    <p className="text-xs sm:text-sm font-medium text-muted-foreground">Total Trips</p>
                     <Ship className="h-4 w-4 text-muted-foreground" />
                   </div>
                   <div className="flex flex-col gap-1">
-                    <p className="text-3xl font-bold">{stats?.summary?.total_trips?.toLocaleString() || '0'}</p>
-                    <div className="flex items-center gap-2 text-sm">
+                    <p className="text-2xl sm:text-3xl font-bold">{stats?.summary?.total_trips?.toLocaleString() || '0'}</p>
+                    <div className="flex items-center gap-2 text-xs sm:text-sm">
                       <span className="text-muted-foreground">
                         {stats?.summary?.month_trips || 0} this month
                       </span>
@@ -185,14 +185,14 @@ export default function Page() {
                 </div>
 
                 {/* Active Boats Card */}
-                <div className="rounded-xl border bg-card p-6">
+                <div className="rounded-xl border bg-card p-4 md:p-5 lg:p-6">
                   <div className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <p className="text-sm font-medium text-muted-foreground">Active Boats</p>
+                    <p className="text-xs sm:text-sm font-medium text-muted-foreground">Active Boats</p>
                     <TrendingUp className="h-4 w-4 text-muted-foreground" />
                   </div>
                   <div className="flex flex-col gap-1">
-                    <p className="text-3xl font-bold">{stats?.summary?.active_boats || '0'}</p>
-                    <div className="flex items-center gap-2 text-sm">
+                    <p className="text-2xl sm:text-3xl font-bold">{stats?.summary?.active_boats || '0'}</p>
+                    <div className="flex items-center gap-2 text-xs sm:text-sm">
                       <span className="text-muted-foreground">
                         of {stats?.summary?.total_boats || 0} registered
                       </span>
@@ -218,7 +218,7 @@ export default function Page() {
               </div>
 
               {/* Charts Grid - 2x2 plus 1 full width */}
-              <div className="grid gap-4 md:grid-cols-2 auto-rows-fr">
+              <div className="grid gap-3 sm:gap-4 grid-cols-1 lg:grid-cols-2 auto-rows-fr">
                 <ExportableChart chartId="nationality-chart" chartName="Tourist_Nationality">
                   <TouristNationalityChart data={stats?.nationality_stats} />
                 </ExportableChart>

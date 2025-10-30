@@ -11,7 +11,20 @@ class BoatController extends Controller
 {
     public function index(): JsonResponse
     {
-        $boats = Boat::with('trips')->latest()->get();
+        // Optimize with lazy loading for trips and field selection
+        $boats = Boat::with([
+            'trips' => function($q) {
+                $q->select(['id', 'boat_id', 'trip_date', 'passengers_count', 'trip_type'])
+                  ->latest('trip_date')
+                  ->limit(5); // Only get recent trips
+            }
+        ])
+        ->select(['id', 'boat_name', 'registration_number', 'boat_type', 'capacity', 
+                 'operator_name', 'operator_contact', 'captain_name', 'captain_license',
+                 'home_port', 'engine_type', 'engine_horsepower', 'year_built', 'status'])
+        ->latest()
+        ->get();
+        
         return response()->json($boats);
     }
 

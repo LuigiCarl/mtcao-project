@@ -11,7 +11,6 @@ import {
   BarChart3,
   Users,
   Ship,
-  Activity,
 } from "lucide-react"
 
 import { SearchForm } from "@/components/search-form"
@@ -52,13 +51,13 @@ const data = {
       ],
     },
     {
-      title: "Real-Time Monitoring",
+      title: "Management",
       url: "#",
       items: [
         {
-          title: "Monitoring Dashboard",
-          url: "/monitoring",
-          icon: Activity,
+          title: "Boat Management",
+          url: "/boats",
+          icon: Ship,
         },
       ],
     },
@@ -123,11 +122,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                             {subItem.icon && <subItem.icon className="h-4 w-4" />}
                             <span>{subItem.title}</span>
                           </span>
-                          {'badge' in subItem && subItem.badge && (
+                          {('badge' in subItem && subItem.badge) ? (
                             <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-orange-100 text-orange-700 dark:bg-orange-950 dark:text-orange-400">
-                              {subItem.badge}
+                              {subItem.badge as React.ReactNode}
                             </span>
-                          )}
+                          ) : null}
                         </Link>
                       </SidebarMenuButton>
                     </SidebarMenuItem>

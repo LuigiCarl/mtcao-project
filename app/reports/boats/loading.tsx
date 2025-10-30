@@ -14,7 +14,7 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
 
-export default function FormsLoading() {
+export default function BoatsReportLoading() {
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -32,7 +32,7 @@ export default function FormsLoading() {
               </BreadcrumbItem>
               <BreadcrumbSeparator className="hidden md:block" />
               <BreadcrumbItem>
-                <BreadcrumbPage>Forms</BreadcrumbPage>
+                <BreadcrumbPage>Boats Report</BreadcrumbPage>
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
@@ -42,28 +42,14 @@ export default function FormsLoading() {
         </header>
 
         <div className="flex flex-1 flex-col gap-4 p-4">
-          {/* Tabs */}
-          <div className="flex gap-2">
-            <Skeleton className="h-10 w-32" />
-            <Skeleton className="h-10 w-32" />
-          </div>
+          {/* Report Content */}
+          <div className="space-y-4">
+            <div className="grid gap-4 md:grid-cols-2">
+              <Skeleton className="h-[300px] rounded-lg" />
+              <Skeleton className="h-[300px] rounded-lg" />
+            </div>
 
-          {/* Tab Content - Tourism Forms */}
-          <div className="space-y-6">
-            {/* Tourism Form */}
-            <Skeleton className="h-[450px] rounded-lg w-full" />
-
-            {/* Tourism Records Table */}
-            <Skeleton className="h-[400px] rounded-lg w-full" />
-          </div>
-
-          {/* Tab Content - Boat Forms */}
-          <div className="space-y-6">
-            {/* Boat Form */}
-            <Skeleton className="h-[350px] rounded-lg w-full" />
-
-            {/* Boat Data Table */}
-            <Skeleton className="h-[400px] rounded-lg w-full" />
+            <Skeleton className="h-[500px] rounded-lg w-full" />
           </div>
         </div>
       </SidebarInset>

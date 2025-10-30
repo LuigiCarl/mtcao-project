@@ -54,31 +54,33 @@ export default function ReportsPage() {
             <ModeToggle />
           </div>
         </header>
-        <div className="flex flex-1 flex-col gap-4 p-4 md:p-6">
+        <div className="flex flex-1 flex-col gap-3 sm:gap-4 p-3 sm:p-4 md:p-6">
           <div className="space-y-2">
-            <h1 className="text-3xl font-bold tracking-tight">Advanced Reports</h1>
-            <p className="text-muted-foreground">
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Advanced Reports</h1>
+            <p className="text-xs sm:text-sm text-muted-foreground">
               Generate detailed reports with custom date filtering (daily, monthly, or yearly)
             </p>
           </div>
 
-          <Tabs defaultValue="tourists" className="space-y-4">
-            <TabsList>
-              <TabsTrigger value="tourists" className="flex items-center gap-2">
-                <Users className="h-4 w-4" />
-                Tourist Arrivals
+          <Tabs defaultValue="tourists" className="space-y-3 sm:space-y-4">
+            <TabsList className="grid w-full grid-cols-2 max-w-full sm:max-w-md">
+              <TabsTrigger value="tourists" className="flex items-center gap-2 text-xs sm:text-sm">
+                <Users className="h-3 w-3 sm:h-4 sm:w-4" />
+                <span className="hidden xs:inline">Tourist Arrivals</span>
+                <span className="xs:hidden">Tourists</span>
               </TabsTrigger>
-              <TabsTrigger value="boats" className="flex items-center gap-2">
-                <Ship className="h-4 w-4" />
-                Boat Trips
+              <TabsTrigger value="boats" className="flex items-center gap-2 text-xs sm:text-sm">
+                <Ship className="h-3 w-3 sm:h-4 sm:w-4" />
+                <span className="hidden xs:inline">Boat Trips</span>
+                <span className="xs:hidden">Boats</span>
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="tourists" className="space-y-4">
+            <TabsContent value="tourists" className="space-y-3 sm:space-y-4">
               <TouristReport />
             </TabsContent>
 
-            <TabsContent value="boats" className="space-y-4">
+            <TabsContent value="boats" className="space-y-3 sm:space-y-4">
               <BoatReport />
             </TabsContent>
           </Tabs>

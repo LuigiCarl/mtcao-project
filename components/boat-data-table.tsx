@@ -86,7 +86,7 @@ export const columns: ColumnDef<Boat>[] = [
   {
     accessorKey: "capacity",
     header: "Capacity",
-    cell: ({ row }) => <div className="text-center">{row.getValue("capacity")}</div>,
+    cell: ({ row }) => <div>{row.getValue("capacity")}</div>,
   },
   {
     accessorKey: "operatorName",
@@ -229,14 +229,14 @@ export function BoatDataTable({ data: propData }: BoatDataTableProps) {
           {table.getFilteredRowModel().rows.length} boat(s) registered
         </div>
       </div>
-      <div className="rounded-md border">
-        <Table>
+      <div className="rounded-md border overflow-x-auto">
+        <Table className="w-full">
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
+              <TableRow key={headerGroup.id} className="hover:bg-transparent">
                 {headerGroup.headers.map((header) => {
                   return (
-                    <TableHead key={header.id}>
+                    <TableHead key={header.id} className="text-xs sm:text-sm whitespace-nowrap">
                       {header.isPlaceholder
                         ? null
                         : flexRender(
@@ -255,9 +255,10 @@ export function BoatDataTable({ data: propData }: BoatDataTableProps) {
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
+                  className="hover:bg-muted/50 text-xs sm:text-sm"
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                    <TableCell key={cell.id} className="py-2 px-2 sm:px-4">
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext()

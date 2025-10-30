@@ -64,9 +64,9 @@ export default function SystemPage() {
             <ModeToggle />
           </div>
         </header>
-        <div className="flex flex-1 flex-col gap-6 p-6">
+        <div className="flex flex-1 flex-col gap-3 sm:gap-4 md:gap-6 p-3 sm:p-4 md:p-6">
           {/* System Information Cards */}
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 xl:grid-cols-3">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Application Version</CardTitle>
@@ -190,8 +190,8 @@ export default function SystemPage() {
                 </p>
               </div>
               
-              <div className="grid gap-3 md:grid-cols-2 my-4">
-                <div className="flex items-start gap-2 text-sm">
+              <div className="grid gap-3 grid-cols-1 md:grid-cols-2 my-4">
+                <div className="flex items-start gap-2 text-xs sm:text-sm">
                   <Database className="h-4 w-4 mt-0.5 text-green-600" />
                   <div>
                     <strong>Database Integration</strong>
@@ -226,19 +226,21 @@ export default function SystemPage() {
                   <Sparkles className="h-4 w-4 text-green-600" />
                   Ready to Build Your Complete Solution?
                 </h4>
-                <p className="text-sm text-muted-foreground mb-4">
+                <p className="text-xs sm:text-sm text-muted-foreground mb-4">
                   I specialize in full-stack development and can transform this beautiful frontend into a 
                   robust, scalable application tailored to your specific needs. With expertise in modern 
                   web technologies, I ensure your project is built with best practices, security, and performance in mind.
                 </p>
-                <div className="flex flex-col sm:flex-row gap-3">
-                  <Button className="bg-green-600 hover:bg-green-700 gap-2">
+                <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+                  <Button className="bg-green-600 hover:bg-green-700 gap-2 text-sm">
                     <Mail className="h-4 w-4" />
-                    Contact for Full Development
+                    <span className="hidden xs:inline">Contact for Full Development</span>
+                    <span className="xs:hidden">Contact</span>
                   </Button>
-                  <Button variant="outline" className="gap-2">
+                  <Button variant="outline" className="gap-2 text-sm">
                     <MessageCircle className="h-4 w-4" />
-                    Discuss Your Requirements
+                    <span className="hidden xs:inline">Discuss Your Requirements</span>
+                    <span className="xs:hidden">Discuss</span>
                   </Button>
                 </div>
               </div>

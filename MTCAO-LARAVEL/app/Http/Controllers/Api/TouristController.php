@@ -10,9 +10,30 @@ use Illuminate\Support\Facades\DB;
 
 class TouristController extends Controller
 {
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        $tourists = Tourist::latest()->paginate(50);
+        // Optimize with eager loading to prevent N+1 queries
+        $query = Tourist::with(['trip' => function($q) {
+            $q->select(['id', 'boat_id', 'trip_date', 'destination']); // Only load needed fields
+        }, 'trip.boat' => function($q) {
+            $q->select(['id', 'boat_name', 'registration_number', 'status']); // Only needed boat fields
+        }])
+        ->select(['id', 'trip_id', 'first_name', 'last_name', 'full_name', 'age', 'gender', 
+                  'nationality', 'origin_city', 'type', 'purpose', 'transport_mode', 
+                  'destination', 'accommodation_type', 'arrival_date', 'departure_date', 'duration_days']);
+
+        // Filter by month and year if provided
+        if ($request->has('month') && $request->month !== 'all') {
+            $query->whereMonth('arrival_date', $request->month + 1);
+        }
+
+        if ($request->has('year') && $request->year !== 'all') {
+            $query->whereYear('arrival_date', $request->year);
+        }
+
+        // Get all tourists (no pagination for monitoring)
+        $tourists = $query->latest('arrival_date')->get();
+        
         return response()->json($tourists);
     }
 

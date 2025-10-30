@@ -103,18 +103,18 @@ export function DataTable({ month, year }: DataTableProps = {}) {
           <p className="text-destructive">Error loading trips: {error}</p>
         </div>
       ) : (
-        <div className="rounded-md border">
-          <Table>
+        <div className="rounded-md border overflow-x-auto">
+          <Table className="w-full">
             <TableHeader>
-              <TableRow>
-                <TableHead>Trip ID</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead>Boat Name</TableHead>
-                <TableHead>Operator</TableHead>
-                <TableHead>Destination</TableHead>
-                <TableHead className="text-center">Passengers</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead>Status</TableHead>
+              <TableRow className="hover:bg-transparent">
+                <TableHead className="text-xs sm:text-sm whitespace-nowrap">Trip ID</TableHead>
+                <TableHead className="text-xs sm:text-sm whitespace-nowrap">Date</TableHead>
+                <TableHead className="text-xs sm:text-sm whitespace-nowrap">Boat Name</TableHead>
+                <TableHead className="text-xs sm:text-sm whitespace-nowrap">Operator</TableHead>
+                <TableHead className="text-xs sm:text-sm whitespace-nowrap">Destination</TableHead>
+                <TableHead className="text-xs sm:text-sm whitespace-nowrap">Passengers</TableHead>
+                <TableHead className="text-xs sm:text-sm whitespace-nowrap">Type</TableHead>
+                <TableHead className="text-xs sm:text-sm whitespace-nowrap">Status</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -126,14 +126,14 @@ export function DataTable({ month, year }: DataTableProps = {}) {
                 </TableRow>
               ) : (
                 paginatedData.map((row) => (
-                  <TableRow key={row.id}>
-                    <TableCell className="font-medium">{row.id}</TableCell>
-                    <TableCell>{row.date}</TableCell>
-                    <TableCell>{row.boatName}</TableCell>
-                    <TableCell>{row.operator}</TableCell>
-                    <TableCell>{row.destination}</TableCell>
-                    <TableCell className="text-center">{row.tourists}</TableCell>
-                    <TableCell>
+                  <TableRow key={row.id} className="hover:bg-muted/50 text-xs sm:text-sm">
+                    <TableCell className="font-medium py-2 px-2 sm:px-4">{row.id}</TableCell>
+                    <TableCell className="py-2 px-2 sm:px-4 whitespace-normal break-words">{row.date}</TableCell>
+                    <TableCell className="py-2 px-2 sm:px-4 whitespace-normal break-words">{row.boatName}</TableCell>
+                    <TableCell className="py-2 px-2 sm:px-4 whitespace-normal break-words">{row.operator}</TableCell>
+                    <TableCell className="py-2 px-2 sm:px-4 whitespace-normal break-words">{row.destination}</TableCell>
+                    <TableCell className="py-2 px-2 sm:px-4">{row.tourists}</TableCell>
+                    <TableCell className="py-2 px-2 sm:px-4">
                       <span className="inline-flex rounded-full px-2 py-1 text-xs font-semibold bg-blue-100 text-blue-800 capitalize">
                         {row.tripType}
                       </span>

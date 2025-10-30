@@ -65,20 +65,24 @@ class AnalyticsController extends Controller
 
     private function getTouristSpotsData($month = null, $year = null)
     {
-        $query = Trip::select('destination', DB::raw('SUM(passengers_count) as visitors'));
+        $query = Tourist::select('destination', DB::raw('COUNT(*) as visitors'));
         
         // Apply date filters if specified
         if ($month && $month !== 'all') {
-            $query->whereMonth('trip_date', $month)
-                  ->whereYear('trip_date', $year);
+            $query->whereMonth('arrival_date', $month)
+                  ->whereYear('arrival_date', $year);
         }
         
-        return $query->groupBy('destination')
+        return $query->whereNotNull('destination')
+            ->groupBy('destination')
             ->orderBy('visitors', 'desc')
             ->get()
             ->map(function ($item) {
+                $destination = str_replace('_', ' ', $item->destination);
+                // Capitalize each word for proper formatting
+                $destination = ucwords(strtolower($destination));
                 return [
-                    'destination' => $item->destination,
+                    'destination' => $destination,
                     'visitors' => (int)$item->visitors,
                 ];
             });
@@ -115,14 +119,18 @@ class AnalyticsController extends Controller
 
     public function touristSpots(): JsonResponse
     {
-        // Get actual destination statistics from trips
-        $spots = Trip::select('destination', DB::raw('SUM(passengers_count) as visitors'))
+        // Get actual destination statistics from tourists
+        $spots = Tourist::select('destination', DB::raw('COUNT(*) as visitors'))
+            ->whereNotNull('destination')
             ->groupBy('destination')
             ->orderBy('visitors', 'desc')
             ->get()
             ->map(function ($item) {
+                $destination = str_replace('_', ' ', $item->destination);
+                // Capitalize each word for proper formatting
+                $destination = ucwords(strtolower($destination));
                 return [
-                    'destination' => $item->destination,
+                    'destination' => $destination,
                     'visitors' => (int)$item->visitors,
                 ];
             });

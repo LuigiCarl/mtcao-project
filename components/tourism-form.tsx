@@ -4,9 +4,10 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm, useFieldArray } from "react-hook-form"
 import * as z from "zod"
 import * as React from "react"
-import { Plus, Trash2, CalendarIcon } from "lucide-react"
+import { Plus, Trash2, CalendarIcon, Loader2 } from "lucide-react"
 import { format } from "date-fns"
 import { cn } from "@/lib/utils"
+import { createTourismRecord, updateTourismRecord } from "@/lib/api/tourism"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -216,6 +217,7 @@ const touristEntrySchema = z.object({
     gender: z.string().min(1, "Required"),
     purpose: z.string().min(1, "Required"),
     transport: z.string().min(1, "Required"),
+    destination: z.string().min(1, "Destination is required"),
     lengthOfStay: z.string().min(1, "Required"),
     isOvernight: z.boolean(),
 })
@@ -232,7 +234,13 @@ const formSchema = z.object({
     touristEntries: z.array(touristEntrySchema).min(1, "At least 1 tourist required").max(10, "Maximum 10 tourists per boat"),
 })
 
-export function TourismForm() {
+interface TourismFormProps {
+    editingRecord?: any
+    onSaveComplete?: () => void
+    onCancel?: () => void
+}
+
+export function TourismForm({ editingRecord, onSaveComplete, onCancel }: TourismFormProps = {}) {
     const [boats, setBoats] = React.useState<Boat[]>([])
     const [boatSuggestions, setBoatSuggestions] = React.useState<Boat[]>([])
     const [showBoatSuggestions, setShowBoatSuggestions] = React.useState(false)
@@ -244,6 +252,11 @@ export function TourismForm() {
     const [captains, setCaptains] = React.useState<string[]>([])
     const [captainSuggestions, setCaptainSuggestions] = React.useState<string[]>([])
     const [showCaptainSuggestions, setShowCaptainSuggestions] = React.useState(false)
+    
+    const [isSubmitting, setIsSubmitting] = React.useState(false)
+    const [submitError, setSubmitError] = React.useState<string | null>(null)
+    const [submitSuccess, setSubmitSuccess] = React.useState(false)
+    const [isEditMode, setIsEditMode] = React.useState(false)
     
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -259,11 +272,12 @@ export function TourismForm() {
                     name: "",
                     age: "",
                     nationality: "Philippines",
-                    origin: "",
+                    origin: "Manila", // Default city
                     isForeign: false,
-                    gender: "",
-                    purpose: "",
-                    transport: "",
+                    gender: "male", // Default gender
+                    purpose: "leisure", // Default purpose
+                    transport: "land", // Default transport
+                    destination: "island_tour", // Default destination
                     lengthOfStay: "0",
                     isOvernight: false,
                 },
@@ -292,6 +306,65 @@ export function TourismForm() {
         }
         fetchBoats()
     }, [])
+    
+    // Load editing record data
+    React.useEffect(() => {
+        if (editingRecord) {
+            console.log('=== LOADING EDITING RECORD ===')
+            console.log('Full editingRecord:', editingRecord)
+            console.log('editingRecord.id:', editingRecord.id)
+            console.log('editingRecord.trip_date:', editingRecord.trip_date)
+            
+            setIsEditMode(true)
+            setSubmitSuccess(false)
+            setSubmitError(null)
+            
+            // Transform backend data to form format
+            const trip = editingRecord
+            
+            // Extract crew from trip remarks (format: "Crew: John Doe")
+            let crewName = "";
+            if (trip.remarks && trip.remarks.startsWith('Crew: ')) {
+                crewName = trip.remarks.substring(6); // Remove "Crew: " prefix
+            }
+            
+            form.reset({
+                visitDate: new Date(trip.trip_date),
+                visitTime: trip.departure_time.substring(0, 5), // HH:mm format
+                boatName: trip.boat?.boat_name || "",
+                boatOperator: trip.boat?.operator_name || "",
+                boatCaptain: trip.boat?.captain_name || "",
+                boatCrew: crewName, // Load from trip remarks
+                touristEntries: trip.tourists?.map((tourist: any) => ({
+                    name: tourist.full_name || `${tourist.first_name} ${tourist.last_name}`,
+                    age: tourist.age?.toString() || "",
+                    gender: tourist.gender || "male", // Default if empty
+                    isForeign: tourist.type === "foreign",
+                    nationality: tourist.nationality || "Philippines", // Default if empty
+                    origin: tourist.origin_city || "Manila", // Default if empty
+                    purpose: tourist.purpose || "leisure", // Default if empty
+                    transport: tourist.transport_mode || "land", // Default if empty
+                    destination: tourist.destination || "island_tour", // Default if empty
+                    isOvernight: tourist.accommodation_type !== "day_tour",
+                    lengthOfStay: tourist.duration_days?.toString() || "0",
+                })) || [{
+                    name: "",
+                    age: "",
+                    nationality: "Philippines",
+                    origin: "Manila", // Default city
+                    isForeign: false,
+                    gender: "male", // Default gender
+                    purpose: "leisure", // Default purpose
+                    transport: "land", // Default transport
+                    destination: "island_tour", // Default destination
+                    lengthOfStay: "0",
+                    isOvernight: false,
+                }]
+            })
+        } else {
+            setIsEditMode(false)
+        }
+    }, [editingRecord, form])
     
     // Handle boat name input and show suggestions
     const handleBoatNameChange = (value: string) => {
@@ -399,11 +472,12 @@ export function TourismForm() {
                 name: "",
                 age: "",
                 nationality: "Philippines",
-                origin: "",
+                origin: "Manila", // Default city
                 isForeign: false,
-                gender: "",
-                purpose: "",
-                transport: "",
+                gender: "male", // Default gender instead of empty
+                purpose: "leisure", // Default purpose instead of empty
+                transport: "land", // Default transport instead of empty
+                destination: "island_tour", // Default destination
                 lengthOfStay: "0",
                 isOvernight: false,
             })
@@ -411,32 +485,123 @@ export function TourismForm() {
     }
     
     function onSubmit(values: z.infer<typeof formSchema>) {
-        console.log(values)
-        alert(`Tourism data submitted successfully!\nTotal tourists recorded: ${values.touristEntries.length}\nCheck console for details.`)
+        setIsSubmitting(true)
+        setSubmitError(null)
+        setSubmitSuccess(false)
+        
+        console.log('=== SUBMIT DEBUG ===')
+        console.log('isEditMode:', isEditMode)
+        console.log('editingRecord:', editingRecord)
+        console.log('editingRecord?.id:', editingRecord?.id)
+        console.log('Will call:', isEditMode && editingRecord?.id ? 'UPDATE' : 'CREATE')
+        
+        const savePromise = isEditMode && editingRecord?.id
+            ? updateTourismRecord(editingRecord.id, values)
+            : createTourismRecord(values)
+        
+        savePromise
+            .then((response) => {
+                console.log('Tourism record saved:', response)
+                setSubmitSuccess(true)
+                
+                const action = isEditMode ? 'updated' : 'recorded'
+                
+                // Show success message
+                alert(
+                    `✅ Tourist arrivals ${action} successfully!\n\n` +
+                    `Trip Details:\n` +
+                    `• Date: ${format(values.visitDate, 'PPP')}\n` +
+                    `• Time: ${values.visitTime}\n` +
+                    `• Boat: ${values.boatName}\n` +
+                    `• Operator: ${values.boatOperator}\n` +
+                    `• Captain: ${values.boatCaptain}\n\n` +
+                    `Tourist Summary:\n` +
+                    `• Total Tourists: ${response.summary?.total_tourists || values.touristEntries.length}\n` +
+                    `• Foreign: ${response.summary?.foreign || 0}\n` +
+                    `• Domestic: ${response.summary?.domestic || 0}\n\n` +
+                    `The data has been saved to the database.`
+                )
+                
+                // Call onSaveComplete callback
+                if (onSaveComplete) {
+                    onSaveComplete()
+                }
+                
+                // Reset form after successful submission (only if not editing)
+                if (!isEditMode) {
+                    form.reset({
+                        visitDate: new Date(),
+                        visitTime: "",
+                        boatName: "",
+                        boatOperator: "",
+                        boatCaptain: "",
+                        boatCrew: "",
+                        touristEntries: [
+                            {
+                                name: "",
+                                age: "",
+                                nationality: "Philippines",
+                                origin: "Manila", // Default city
+                                isForeign: false,
+                                gender: "male", // Default gender
+                                purpose: "leisure", // Default purpose
+                                transport: "land", // Default transport
+                                destination: "island_tour", // Default destination
+                                lengthOfStay: "0",
+                                isOvernight: false,
+                            }
+                        ]
+                    })
+                }
+            })
+            .catch((error) => {
+                console.error('Error creating tourism record:', error)
+                setSubmitError(error.message || 'Failed to save tourist arrivals. Please try again.')
+                
+                alert(
+                    `❌ Error: Failed to save tourist arrivals\n\n` +
+                    `${error.message || 'Please check your internet connection and try again.'}\n\n` +
+                    `Your data has not been lost. You can try submitting again.`
+                )
+            })
+            .finally(() => {
+                setIsSubmitting(false)
+            })
     }
     
     return (
         <div className="w-full px-2 sm:px-0">
         <div className="pb-4 sm:pb-6">
-        <h3 className="text-xl sm:text-2xl font-semibold">Tourism Data Entry (Boat Transaction)</h3>
+        <h3 className="text-xl sm:text-2xl font-semibold">
+            {isEditMode ? '✏️ Edit Tourist Arrival Record' : 'Tourist Arrival Recording'}
+        </h3>
         <p className="text-xs sm:text-sm text-muted-foreground mt-1">
-        Record tourist information for boat trips. Add 1-10 tourists per transaction.
+        {isEditMode 
+            ? 'Update the trip details and tourist information. You can add or remove tourists from this trip.'
+            : 'Record each tourist who boards your boat. Simply collect their information when they arrive.'}
         </p>
+        {isEditMode && (
+            <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-md">
+                <p className="text-sm text-blue-800">
+                    💡 <strong>Tip:</strong> You can add more tourists by clicking "Add Another Tourist" below, or remove tourists you don't need.
+                </p>
+            </div>
+        )}
         </div>
         <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 sm:space-y-8">
         
         {/* Visit Date and Boat Information */}
-        <div className="rounded-lg border bg-muted/50 p-4 sm:p-6">
-        <h4 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Visit Date & Boat Information</h4>
-        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="rounded-lg border bg-muted/50 p-4 md:p-5 lg:p-6">
+        <h4 className="text-base md:text-lg font-semibold mb-3 md:mb-4">Trip Details & Your Boat Information</h4>
+        <div className="grid gap-3 sm:gap-4 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
         {/* Visit Date */}
         <FormField
         control={form.control}
         name="visitDate"
         render={({ field }) => (
             <FormItem className="flex flex-col">
-            <FormLabel>Date of Visit</FormLabel>
+            <FormLabel className="text-sm md:text-base">Date of Trip</FormLabel>
             <FormControl>
                 <DateTimePicker
                 date={field.value}
@@ -454,7 +619,7 @@ export function TourismForm() {
         name="visitTime"
         render={({ field }) => (
             <FormItem>
-            <FormLabel>Time of Visit</FormLabel>
+            <FormLabel>Departure Time</FormLabel>
             <FormControl>
                 <Input type="time" {...field} />
             </FormControl>
@@ -469,11 +634,11 @@ export function TourismForm() {
         name="boatName"
         render={({ field }) => (
             <FormItem className="relative">
-            <FormLabel>Boat Name</FormLabel>
+            <FormLabel>Your Boat Name</FormLabel>
             <FormControl>
                 <div className="relative">
                     <Input 
-                        placeholder="Type to search boats..." 
+                        placeholder="Type your boat name..." 
                         value={field.value}
                         onChange={(e) => {
                             field.onChange(e.target.value)
@@ -509,7 +674,7 @@ export function TourismForm() {
                     )}
                 </div>
             </FormControl>
-            <FormDescription>Start typing to see boat suggestions</FormDescription>
+            <FormDescription>Your boat's name</FormDescription>
             <FormMessage />
             </FormItem>
         )}
@@ -521,7 +686,7 @@ export function TourismForm() {
         name="boatOperator"
         render={({ field }) => (
             <FormItem className="relative">
-            <FormLabel>Boat Operator</FormLabel>
+            <FormLabel>Boat Operator Name</FormLabel>
             <FormControl>
                 <div className="relative">
                     <Input 
@@ -558,7 +723,7 @@ export function TourismForm() {
                     )}
                 </div>
             </FormControl>
-            <FormDescription>Type to search or select from boats</FormDescription>
+            <FormDescription>Operator/owner of the boat</FormDescription>
             <FormMessage />
             </FormItem>
         )}
@@ -570,7 +735,7 @@ export function TourismForm() {
         name="boatCaptain"
         render={({ field }) => (
             <FormItem className="relative">
-            <FormLabel>Boat Captain</FormLabel>
+            <FormLabel>Captain Name</FormLabel>
             <FormControl>
                 <div className="relative">
                     <Input 
@@ -607,7 +772,7 @@ export function TourismForm() {
                     )}
                 </div>
             </FormControl>
-            <FormDescription>Type to search or select from boats</FormDescription>
+            <FormDescription>Captain operating this trip</FormDescription>
             <FormMessage />
             </FormItem>
         )}
@@ -619,9 +784,9 @@ export function TourismForm() {
         name="boatCrew"
         render={({ field }) => (
             <FormItem>
-            <FormLabel>Boat Crew</FormLabel>
+            <FormLabel>Crew Members</FormLabel>
             <FormControl>
-                <Input placeholder="Enter crew name(s)" {...field} />
+                <Input placeholder="Enter crew names (optional)" {...field} />
             </FormControl>
             <FormMessage />
             </FormItem>
@@ -633,9 +798,9 @@ export function TourismForm() {
         {/* Tourist Entries */}
         <div className="space-y-4">
         <div className="pb-2">
-        <h4 className="text-base sm:text-lg font-semibold">Tourist Entries ({fields.length}/10)</h4>
+        <h4 className="text-base sm:text-lg font-semibold">Tourist Data ({fields.length}/10)</h4>
         <p className="text-xs sm:text-sm text-muted-foreground mt-1">
-        Add tourists who traveled together on the same boat
+        Collect basic details from each tourist boarding this trip (maximum 10 per trip).
         </p>
         </div>
         
@@ -657,20 +822,20 @@ export function TourismForm() {
             )}
             </div>
             
-            <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-3 sm:gap-4 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
             {/* Column 1: Personal Identity */}
-            <div className="space-y-4">
+            <div className="space-y-3 md:space-y-4">
             {/* Name */}
             <FormField
             control={form.control}
             name={`touristEntries.${index}.name`}
             render={({ field }) => (
                 <FormItem>
-                <FormLabel>Full Name</FormLabel>
+                <FormLabel className="text-sm md:text-base">Tourist Name</FormLabel>
                 <FormControl>
-                <Input placeholder="e.g., John Doe" {...field} />
+                <Input placeholder="Ask for their full name" className="text-sm md:text-base" {...field} />
                 </FormControl>
-                <FormDescription className="h-5">&nbsp;</FormDescription>
+                <FormDescription className="h-5 text-xs md:text-sm">&nbsp;</FormDescription>
                 <FormMessage />
                 </FormItem>
             )}
@@ -682,11 +847,11 @@ export function TourismForm() {
             name={`touristEntries.${index}.age`}
             render={({ field }) => (
                 <FormItem>
-                <FormLabel>Age</FormLabel>
+                <FormLabel className="text-sm md:text-base">Age</FormLabel>
                 <FormControl>
-                <Input type="number" placeholder="e.g., 25" {...field} />
+                <Input type="number" placeholder="e.g., 25" className="text-sm md:text-base" {...field} />
                 </FormControl>
-                <FormDescription className="h-5">&nbsp;</FormDescription>
+                <FormDescription className="h-5 text-xs md:text-sm">&nbsp;</FormDescription>
                 <FormMessage />
                 </FormItem>
             )}
@@ -698,10 +863,10 @@ export function TourismForm() {
             name={`touristEntries.${index}.gender`}
             render={({ field }) => (
                 <FormItem>
-                <FormLabel>Gender</FormLabel>
+                <FormLabel className="text-sm md:text-base">Gender</FormLabel>
                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
-                <SelectTrigger>
+                <SelectTrigger className="text-sm md:text-base">
                 <SelectValue placeholder="Select gender" />
                 </SelectTrigger>
                 </FormControl>
@@ -710,7 +875,7 @@ export function TourismForm() {
                 <SelectItem value="female">Female</SelectItem>
                 </SelectContent>
                 </Select>
-                <FormDescription className="h-5">&nbsp;</FormDescription>
+                <FormDescription className="h-5 text-xs md:text-sm">&nbsp;</FormDescription>
                 <FormMessage />
                 </FormItem>
             )}
@@ -718,14 +883,14 @@ export function TourismForm() {
             </div>
             
             {/* Column 2: Origin & Classification */}
-            <div className="space-y-4">
+            <div className="space-y-3 md:space-y-4">
             {/* Foreign/Domestic - Moved up as it determines other fields */}
             <FormField
             control={form.control}
             name={`touristEntries.${index}.isForeign`}
             render={({ field }) => (
                 <FormItem>
-                <FormLabel>Tourist Type</FormLabel>
+                <FormLabel className="text-sm md:text-base">Visitor Type</FormLabel>
                 <FormControl>
                 <div className="flex items-center space-x-2 h-10 rounded-md border px-3">
                 <Checkbox
@@ -740,12 +905,10 @@ export function TourismForm() {
                     }
                 }}
                 />
-                <span className="text-sm text-muted-foreground">Foreign/International</span>
+                <span className="text-xs md:text-sm text-muted-foreground">Foreign/International</span>
                 </div>
                 </FormControl>
-                <FormDescription className="h-5">
-                    {field.value ? "International visitor" : "Domestic (Filipino)"}
-                </FormDescription>
+                <FormDescription className="h-5 text-xs md:text-sm">&nbsp;</FormDescription>
                 <FormMessage />
                 </FormItem>
             )}
@@ -757,7 +920,7 @@ export function TourismForm() {
             name={`touristEntries.${index}.nationality`}
             render={({ field }) => (
                 <FormItem>
-                <FormLabel>Nationality</FormLabel>
+                <FormLabel className="text-sm md:text-base">Nationality</FormLabel>
                 {form.watch(`touristEntries.${index}.isForeign`) ? (
                     <Select 
                         onValueChange={(value) => {
@@ -768,7 +931,7 @@ export function TourismForm() {
                         value={field.value}
                     >
                     <FormControl>
-                    <SelectTrigger>
+                    <SelectTrigger className="text-sm md:text-base">
                         <SelectValue placeholder="Select country" />
                     </SelectTrigger>
                     </FormControl>
@@ -785,13 +948,11 @@ export function TourismForm() {
                     <Input 
                         value="Philippines" 
                         readOnly 
-                        className="bg-muted"
+                        className="bg-muted text-sm md:text-base"
                     />
                     </FormControl>
                 )}
-                <FormDescription className="h-5">
-                    {!form.watch(`touristEntries.${index}.isForeign`) ? "Philippines (Domestic)" : "Country of origin"}
-                </FormDescription>
+                <FormDescription className="h-5 text-xs md:text-sm">&nbsp;</FormDescription>
                 <FormMessage />
                 </FormItem>
             )}
@@ -807,7 +968,7 @@ export function TourismForm() {
                 
                 return (
                 <FormItem>
-                <FormLabel>Origin (City/Region)</FormLabel>
+                <FormLabel className="text-sm md:text-base">Where They're Coming From</FormLabel>
                 <Select 
                     onValueChange={(value) => {
                         if (value === 'other') {
@@ -819,7 +980,7 @@ export function TourismForm() {
                     value={isOtherCity ? 'other' : field.value}
                 >
                 <FormControl>
-                <SelectTrigger>
+                <SelectTrigger className="text-sm md:text-base">
                     <SelectValue placeholder={availableCities.length > 0 ? "Select city" : "Select country first"} />
                 </SelectTrigger>
                 </FormControl>
@@ -850,13 +1011,13 @@ export function TourismForm() {
                         placeholder="Please specify city/region"
                         value={isOtherCity ? field.value : ''}
                         onChange={(e) => field.onChange(e.target.value)}
-                        className="mt-2"
+                        className="mt-2 text-sm md:text-base"
                     />
                     </FormControl>
                 )}
                 
-                <FormDescription className="h-5">
-                    {isOtherCity ? "Specify your city/region" : `Cities from ${selectedCountry}`}
+                <FormDescription className="h-5 text-xs md:text-sm">
+                    {isOtherCity ? "Specify city/region" : "\u00A0"}
                 </FormDescription>
                 <FormMessage />
                 </FormItem>
@@ -870,11 +1031,11 @@ export function TourismForm() {
             name={`touristEntries.${index}.purpose`}
             render={({ field }) => (
                 <FormItem>
-                <FormLabel>Purpose of Visit</FormLabel>
+                <FormLabel className="text-sm md:text-base">Why Are They Visiting?</FormLabel>
                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
-                <SelectTrigger>
-                <SelectValue placeholder="Select purpose" />
+                <SelectTrigger className="text-sm md:text-base">
+                <SelectValue placeholder="Ask their purpose" />
                 </SelectTrigger>
                 </FormControl>
                 <SelectContent>
@@ -885,7 +1046,7 @@ export function TourismForm() {
                 <SelectItem value="others">Others</SelectItem>
                 </SelectContent>
                 </Select>
-                <FormDescription className="h-5">&nbsp;</FormDescription>
+                <FormDescription className="h-5 text-xs md:text-sm">&nbsp;</FormDescription>
                 <FormMessage />
                 </FormItem>
             )}
@@ -893,27 +1054,53 @@ export function TourismForm() {
             </div>
             
             {/* Column 3: Travel & Stay Details */}
-            <div className="space-y-4">
+            <div className="space-y-3 md:space-y-4">
             {/* Transport */}
             <FormField
             control={form.control}
             name={`touristEntries.${index}.transport`}
             render={({ field }) => (
                 <FormItem>
-                <FormLabel>Mode of Transport</FormLabel>
+                <FormLabel className="text-sm md:text-base">How Did They Get Here?</FormLabel>
                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
-                <SelectTrigger>
-                <SelectValue placeholder="Select transport" />
+                <SelectTrigger className="text-sm md:text-base">
+                <SelectValue placeholder="Ask their transport" />
                 </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                <SelectItem value="land">Land</SelectItem>
-                <SelectItem value="air">Air</SelectItem>
-                <SelectItem value="sea">Sea</SelectItem>
+                <SelectItem value="land">Land (Bus/Car/Van)</SelectItem>
+                <SelectItem value="air">Air (Airplane)</SelectItem>
+                <SelectItem value="sea">Sea (Boat/Ferry)</SelectItem>
                 </SelectContent>
                 </Select>
-                <FormDescription className="h-5">&nbsp;</FormDescription>
+                <FormDescription className="h-5 text-xs md:text-sm">&nbsp;</FormDescription>
+                <FormMessage />
+                </FormItem>
+            )}
+            />
+            
+            {/* Destination */}
+            <FormField
+            control={form.control}
+            name={`touristEntries.${index}.destination`}
+            render={({ field }) => (
+                <FormItem>
+                <FormLabel className="text-sm md:text-base">Which Destination?</FormLabel>
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                <SelectTrigger className="text-sm md:text-base">
+                <SelectValue placeholder="Ask their destination" />
+                </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                <SelectItem value="island_tour">Island Tour</SelectItem>
+                <SelectItem value="juag_lagoon">Juag Lagoon</SelectItem>
+                <SelectItem value="cave_diving">Cave Diving</SelectItem>
+                <SelectItem value="beach">Beach</SelectItem>
+                </SelectContent>
+                </Select>
+                <FormDescription className="h-5 text-xs md:text-sm">&nbsp;</FormDescription>
                 <FormMessage />
                 </FormItem>
             )}
@@ -925,7 +1112,7 @@ export function TourismForm() {
             name={`touristEntries.${index}.isOvernight`}
             render={({ field }) => (
                 <FormItem>
-                <FormLabel>Overnight Stay</FormLabel>
+                <FormLabel className="text-sm md:text-base">Are They Staying Overnight?</FormLabel>
                 <FormControl>
                 <div className="flex items-center space-x-2 h-10 rounded-md border px-3">
                 <Checkbox
@@ -938,11 +1125,11 @@ export function TourismForm() {
                     }
                 }}
                 />
-                <span className="text-sm text-muted-foreground">Staying overnight</span>
+                <span className="text-xs md:text-sm text-muted-foreground">Yes, staying overnight</span>
                 </div>
                 </FormControl>
-                <FormDescription className="h-5">
-                    {parseFloat(form.watch(`touristEntries.${index}.lengthOfStay`) || '0') >= 3 ? "Staycation (3+ days)" : field.value ? "At least 1 night" : "Day trip only"}
+                <FormDescription className="h-5 text-xs md:text-sm">
+                    {parseFloat(form.watch(`touristEntries.${index}.lengthOfStay`) || '0') >= 3 ? "Staycation (3+ nights)" : "\u00A0"}
                 </FormDescription>
                 <FormMessage />
                 </FormItem>
@@ -955,15 +1142,15 @@ export function TourismForm() {
             name={`touristEntries.${index}.lengthOfStay`}
             render={({ field }) => (
                 <FormItem>
-                <FormLabel>Length of Stay (days)</FormLabel>
+                <FormLabel className="text-sm md:text-base">Length of Stay (days)</FormLabel>
                 <FormControl>
                 <Input 
                     type="number" 
                     step="0.5" 
                     placeholder="0" 
+                    className={`text-sm md:text-base ${!form.watch(`touristEntries.${index}.isOvernight`) ? "bg-muted" : ""}`}
                     {...field}
                     readOnly={!form.watch(`touristEntries.${index}.isOvernight`)}
-                    className={!form.watch(`touristEntries.${index}.isOvernight`) ? "bg-muted" : ""}
                     onChange={(e) => {
                         field.onChange(e)
                         const days = parseFloat(e.target.value || '0')
@@ -974,8 +1161,8 @@ export function TourismForm() {
                     }}
                 />
                 </FormControl>
-                <FormDescription className="h-5">
-                    {!form.watch(`touristEntries.${index}.isOvernight`) ? "Same-day return" : "Number of nights"}
+                <FormDescription className="h-5 text-xs md:text-sm">
+                    {!form.watch(`touristEntries.${index}.isOvernight`) ? "0 days" : "Number of nights"}
                 </FormDescription>
                 <FormMessage />
                 </FormItem>
@@ -990,29 +1177,55 @@ export function TourismForm() {
         </div>
         
         {/* Submit Buttons */}
+        {submitError && (
+            <div className="p-4 bg-destructive/10 border border-destructive rounded-lg">
+                <p className="text-sm text-destructive font-medium">❌ {submitError}</p>
+            </div>
+        )}
+        
+        {submitSuccess && (
+            <div className="p-4 bg-green-50 border border-green-500 rounded-lg">
+                <p className="text-sm text-green-700 font-medium">✅ Tourist arrivals recorded successfully!</p>
+            </div>
+        )}
+        
         <div className="flex flex-col sm:flex-row justify-between gap-3 sm:gap-4 pt-4">
         <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-        <Button type="submit" className="bg-green-600 hover:bg-green-700 w-full sm:w-auto">
-        Submit Boat Transaction
+        <Button 
+            type="submit" 
+            className="bg-green-600 hover:bg-green-700 w-full sm:w-auto"
+            disabled={isSubmitting}
+        >
+            {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            {isSubmitting 
+              ? 'Saving...' 
+              : isEditMode 
+                ? 'Update Trip Record' 
+                : 'Submit Trip Record'}
         </Button>
         <Button
         type="button"
         variant="outline"
-        onClick={() => form.reset()}
+        onClick={() => {
+            form.reset()
+            setSubmitError(null)
+            setSubmitSuccess(false)
+        }}
         className="w-full sm:w-auto"
+        disabled={isSubmitting}
         >
         Reset Form
         </Button>
         </div>
         <Button
         type="button"
-        variant="outline"
+        variant={isEditMode ? "default" : "outline"}
         onClick={addTouristEntry}
         disabled={fields.length >= 10}
-        className="gap-2 w-full sm:w-auto"
+        className={`gap-2 w-full sm:w-auto ${isEditMode ? 'bg-green-600 hover:bg-green-700' : ''}`}
         >
         <Plus className="h-4 w-4" />
-        Add Tourist ({fields.length}/10)
+        {isEditMode ? `Add More Tourists (${fields.length}/10)` : `Add Another Tourist (${fields.length}/10)`}
         </Button>
         </div>
         </form>

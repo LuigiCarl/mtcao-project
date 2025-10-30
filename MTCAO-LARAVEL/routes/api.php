@@ -4,14 +4,16 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\TouristController;
 use App\Http\Controllers\Api\BoatController;
 use App\Http\Controllers\Api\TripController;
+use App\Http\Controllers\Api\TourismController;
 use App\Http\Controllers\Api\AnalyticsController;
 use App\Http\Controllers\Api\SettingsController;
 use App\Http\Controllers\Api\ExportController;
 use App\Http\Controllers\Api\ReportsController;
-use App\Http\Controllers\Api\BoatMonitoringController;
-use App\Http\Controllers\Api\TouristMonitoringController;
 
 Route::middleware('api')->group(function () {
+    // Tourism routes (Combined Trip + Tourists)
+    Route::apiResource('tourism', TourismController::class);
+    
     // Tourist routes
     Route::apiResource('tourists', TouristController::class);
     Route::get('tourists/stats/summary', [TouristController::class, 'summary']);
@@ -78,26 +80,5 @@ Route::middleware('api')->group(function () {
         // Legacy routes (backward compatible)
         Route::get('/monthly-tourist-arrivals', [ReportsController::class, 'getMonthlyTouristArrivals']);
         Route::get('/monthly-boat-trips', [ReportsController::class, 'getMonthlyBoatTrips']);
-    });
-    
-    // Boat Monitoring routes
-    Route::prefix('boat-monitoring')->group(function () {
-        Route::get('/cycle-status', [BoatMonitoringController::class, 'getCycleStatus']);
-        Route::get('/next-available', [BoatMonitoringController::class, 'getNextAvailableBoat']);
-        Route::post('/assign-trip', [BoatMonitoringController::class, 'assignTrip']);
-        Route::post('/start-new-cycle', [BoatMonitoringController::class, 'startNewCycle']);
-        Route::post('/reset-positions', [BoatMonitoringController::class, 'resetCyclePositions']);
-        Route::get('/cycle-history', [BoatMonitoringController::class, 'getCycleHistory']);
-    });
-    
-    // Tourist Monitoring routes
-    Route::prefix('tourist-monitoring')->group(function () {
-        Route::get('/today-stats', [TouristMonitoringController::class, 'getTodayStats']);
-        Route::get('/weekly-stats', [TouristMonitoringController::class, 'getWeeklyStats']);
-        Route::get('/recent-arrivals', [TouristMonitoringController::class, 'getRecentArrivals']);
-        Route::get('/top-nationalities', [TouristMonitoringController::class, 'getTopNationalities']);
-        Route::get('/by-purpose', [TouristMonitoringController::class, 'getByPurpose']);
-        Route::get('/live-dashboard', [TouristMonitoringController::class, 'getLiveDashboard']);
-        Route::get('/trends', [TouristMonitoringController::class, 'getTrends']);
     });
 });
