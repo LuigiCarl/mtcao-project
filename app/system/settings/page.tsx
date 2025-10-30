@@ -462,10 +462,10 @@ export default function SettingsPage() {
   return (
     <SidebarProvider>
       <AppSidebar />
-      <SidebarInset>
-        <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
+      <SidebarInset className="overflow-x-hidden">
+        <header className="flex h-16 shrink-0 items-center gap-1 sm:gap-2 border-b px-2 sm:px-4 overflow-x-hidden">
           <SidebarTrigger className="-ml-1" />
-          <Separator orientation="vertical" className="mr-2 h-4" />
+          <Separator orientation="vertical" className="mr-1 sm:mr-2 h-4" />
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem className="hidden md:block">
@@ -862,13 +862,13 @@ export default function SettingsPage() {
                 </CardContent>
               </Card>
 
-              <Card className="border-red-200 dark:border-red-900">
-                <CardHeader className="bg-red-50 dark:bg-red-950">
-                  <CardTitle className="flex items-center gap-2 text-red-900 dark:text-red-100">
+              <Card className="border-red-300 dark:border-red-800">
+                <CardHeader className="border-b border-red-200 dark:border-red-800">
+                  <CardTitle className="flex items-center gap-2 text-red-600 dark:text-red-500">
                     <AlertTriangle className="h-5 w-5" />
                     Danger Zone
                   </CardTitle>
-                  <CardDescription className="text-red-700 dark:text-red-300">
+                  <CardDescription className="text-muted-foreground">
                     ⚠️ These actions are irreversible. Proceed with extreme caution!
                   </CardDescription>
                 </CardHeader>
@@ -879,8 +879,8 @@ export default function SettingsPage() {
                     </p>
                     
                     <div className="grid gap-4 md:grid-cols-3">
-                      <div className="flex flex-col gap-2 p-4 border border-red-200 rounded-lg bg-red-50/50 dark:bg-red-950/20">
-                        <p className="font-medium text-sm text-red-900 dark:text-red-100">Clear Tourists</p>
+                      <div className="flex flex-col gap-2 p-4 border border-border rounded-lg bg-card hover:bg-accent/50 transition-colors">
+                        <p className="font-medium text-sm">Clear Tourists</p>
                         <Button 
                           variant="destructive" 
                           size="sm"
@@ -890,8 +890,8 @@ export default function SettingsPage() {
                           {isClearing ? 'Clearing...' : 'Clear'}
                         </Button>
                       </div>
-                      <div className="flex flex-col gap-2 p-4 border border-red-200 rounded-lg bg-red-50/50 dark:bg-red-950/20">
-                        <p className="font-medium text-sm text-red-900 dark:text-red-100">Clear Boats</p>
+                      <div className="flex flex-col gap-2 p-4 border border-border rounded-lg bg-card hover:bg-accent/50 transition-colors">
+                        <p className="font-medium text-sm">Clear Boats</p>
                         <Button 
                           variant="destructive" 
                           size="sm"
@@ -901,8 +901,8 @@ export default function SettingsPage() {
                           {isClearing ? 'Clearing...' : 'Clear'}
                         </Button>
                       </div>
-                      <div className="flex flex-col gap-2 p-4 border border-red-200 rounded-lg bg-red-50/50 dark:bg-red-950/20">
-                        <p className="font-medium text-sm text-red-900 dark:text-red-100">Clear Trips</p>
+                      <div className="flex flex-col gap-2 p-4 border border-border rounded-lg bg-card hover:bg-accent/50 transition-colors">
+                        <p className="font-medium text-sm">Clear Trips</p>
                         <Button 
                           variant="destructive" 
                           size="sm"
@@ -914,13 +914,13 @@ export default function SettingsPage() {
                       </div>
                     </div>
 
-                    <Separator className="bg-red-200" />
+                    <Separator />
 
-                    <div className="p-4 border-2 border-red-300 rounded-lg bg-red-100 dark:bg-red-950">
+                    <div className="p-4 border border-red-300 dark:border-red-800 rounded-lg bg-red-50/30 dark:bg-red-950/20">
                       <div className="space-y-4">
                         <div>
-                          <p className="font-bold text-red-900 dark:text-red-100 mb-2">🚨 CLEAR ALL DATA</p>
-                          <p className="text-sm text-red-800 dark:text-red-200 mb-4">
+                          <p className="font-bold text-red-600 dark:text-red-500 mb-2">🚨 CLEAR ALL DATA</p>
+                          <p className="text-sm text-muted-foreground mb-4">
                             This will delete ALL tourists, boats, and trips from your database. 
                             An automatic backup will be created first.
                           </p>
@@ -938,7 +938,7 @@ export default function SettingsPage() {
                         ) : (
                           <div className="space-y-4">
                             <div className="space-y-2">
-                              <Label htmlFor="clear-confirm" className="text-red-900 dark:text-red-100">
+                              <Label htmlFor="clear-confirm">
                                 Type <span className="font-mono font-bold">DELETE ALL DATA</span> to confirm:
                               </Label>
                               <Input
@@ -946,7 +946,7 @@ export default function SettingsPage() {
                                 value={clearConfirmText}
                                 onChange={(e) => setClearConfirmText(e.target.value)}
                                 placeholder="DELETE ALL DATA"
-                                className="font-mono border-red-300"
+                                className="font-mono"
                               />
                             </div>
                             <div className="flex gap-2">

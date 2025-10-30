@@ -4,7 +4,7 @@ import * as React from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
-import { Calendar, Ship } from "lucide-react"
+import { Calendar, Sailboat } from "lucide-react"
 import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts"
 import { ChartContainer, ChartTooltipContent } from "@/components/ui/chart"
 import { Input } from "@/components/ui/input"
@@ -275,7 +275,7 @@ export function BoatReport() {
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-medium flex items-center gap-2">
-              <Ship className="h-4 w-4" />
+              <Sailboat className="h-4 w-4" />
               Total Trips
             </CardTitle>
           </CardHeader>

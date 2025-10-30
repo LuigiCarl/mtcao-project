@@ -33,7 +33,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Users, Ship, Calendar as CalendarIcon, TrendingUp } from "lucide-react"
+import { Users, Sailboat, Calendar as CalendarIcon, TrendingUp } from "lucide-react"
 import { useDashboardStats } from "@/hooks/use-api"
 import { Skeleton } from "@/components/ui/skeleton"
 
@@ -66,14 +66,14 @@ export default function Page() {
   return (
     <SidebarProvider>
       <AppSidebar />
-      <SidebarInset>
-        <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
+      <SidebarInset className="overflow-x-hidden">
+        <header className="flex h-16 shrink-0 items-center gap-1 sm:gap-2 border-b px-2 sm:px-4 overflow-x-hidden">
           <SidebarTrigger className="-ml-1" />
           <Separator
             orientation="vertical"
-            className="mr-2 data-[orientation=vertical]:h-4"
+            className="mr-1 sm:mr-2 data-[orientation=vertical]:h-4"
           />
-          <Breadcrumb>
+          <Breadcrumb className="hidden sm:block">
             <BreadcrumbList>
               <BreadcrumbItem className="hidden md:block">
                 <BreadcrumbLink href="#">
@@ -86,11 +86,11 @@ export default function Page() {
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
-          <div className="ml-auto flex items-center gap-2">
+          <div className="ml-auto flex items-center gap-1 sm:gap-2 flex-shrink-0">
             {/* Month Selector */}
             <Select value={selectedMonth} onValueChange={setSelectedMonth}>
-              <SelectTrigger className="w-[140px]">
-                <CalendarIcon className="mr-2 h-4 w-4" />
+              <SelectTrigger className="w-[120px] sm:w-[140px] text-xs sm:text-sm">
+                <CalendarIcon className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
                 <SelectValue placeholder="Select month" />
               </SelectTrigger>
               <SelectContent>
@@ -104,7 +104,7 @@ export default function Page() {
             
             {/* Year Selector */}
             <Select value={selectedYear} onValueChange={setSelectedYear}>
-              <SelectTrigger className="w-[100px]">
+              <SelectTrigger className="w-[80px] sm:w-[100px] text-xs sm:text-sm">
                 <SelectValue placeholder="Year" />
               </SelectTrigger>
               <SelectContent>
@@ -119,19 +119,19 @@ export default function Page() {
             <ModeToggle />
           </div>
         </header>
-        <div className="flex flex-1 flex-col gap-4 p-4">
+        <div className="flex flex-1 flex-col gap-3 sm:gap-4 p-3 sm:p-4 overflow-x-hidden">
           {/* Filter Info Banner */}
           {selectedMonth !== "all" && (
-            <div className="rounded-lg border bg-muted/50 p-3 flex items-center justify-between">
+            <div className="rounded-lg border bg-muted/50 p-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
               <div className="flex items-center gap-2">
-                <CalendarIcon className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm font-medium">
+                <CalendarIcon className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                <span className="text-xs sm:text-sm font-medium">
                   Showing data for {months.find(m => m.value === selectedMonth)?.label} {selectedYear}
                 </span>
               </div>
               <button
                 onClick={() => setSelectedMonth("all")}
-                className="text-sm text-muted-foreground hover:text-foreground underline"
+                className="text-xs sm:text-sm text-muted-foreground hover:text-foreground underline whitespace-nowrap"
               >
                 Clear filter
               </button>
@@ -172,7 +172,7 @@ export default function Page() {
                 <div className="rounded-xl border bg-card p-4 md:p-5 lg:p-6">
                   <div className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <p className="text-xs sm:text-sm font-medium text-muted-foreground">Total Trips</p>
-                    <Ship className="h-4 w-4 text-muted-foreground" />
+                    <Sailboat className="h-4 w-4 text-muted-foreground" />
                   </div>
                   <div className="flex flex-col gap-1">
                     <p className="text-2xl sm:text-3xl font-bold">{stats?.summary?.total_trips?.toLocaleString() || '0'}</p>
@@ -238,14 +238,14 @@ export default function Page() {
                 <TouristSpotChart data={stats?.tourist_spots} />
               </ExportableChart>
 
-              <div className="rounded-xl border bg-card p-6">
+              <div className="rounded-xl border bg-card p-3 sm:p-4 md:p-6 overflow-hidden">
                 <DataTable month={selectedMonth} year={selectedYear} />
               </div>
 
-              <div className="rounded-xl border bg-card p-6">
-                <div className="pb-4">
-                  <h3 className="text-2xl font-semibold">Registered Boats</h3>
-                  <p className="text-sm text-muted-foreground">
+              <div className="rounded-xl border bg-card p-3 sm:p-4 md:p-6 overflow-hidden">
+                <div className="pb-3 sm:pb-4">
+                  <h3 className="text-lg sm:text-xl md:text-2xl font-semibold">Registered Boats</h3>
+                  <p className="text-xs sm:text-sm text-muted-foreground">
                     Overview of all boats registered in the system
                   </p>
                 </div>

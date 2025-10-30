@@ -18,8 +18,8 @@ export default function Home() {
   return (
     <SidebarProvider>
       <AppSidebar />
-      <SidebarInset>
-        <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
+      <SidebarInset className="overflow-x-hidden">
+        <header className="flex h-16 shrink-0 items-center gap-1 sm:gap-2 border-b px-2 sm:px-4 overflow-x-hidden">
           <SidebarTrigger className="-ml-1" />
           <Separator
             orientation="vertical"

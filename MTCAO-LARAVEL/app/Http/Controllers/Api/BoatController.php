@@ -13,11 +13,14 @@ class BoatController extends Controller
     {
         // Optimize with lazy loading for trips and field selection
         $boats = Boat::with([
-            'trips' => function($q) {
-                $q->select(['id', 'boat_id', 'trip_date', 'passengers_count', 'trip_type'])
-                  ->latest('trip_date')
-                  ->limit(5); // Only get recent trips
-            }
+                        'trips' => function($q) {
+                                // Avoid per-parent LIMIT in eager load (some MySQL versions/sql_modes
+                                // produce invalid SQL when Eloquent uses window functions).
+                                // Return recent trips ordered by date; limit per-boat can be applied
+                                // in application logic if needed.
+                                $q->select(['id', 'boat_id', 'trip_date', 'passengers_count', 'trip_type'])
+                                    ->latest('trip_date');
+                        }
         ])
         ->select(['id', 'boat_name', 'registration_number', 'boat_type', 'capacity', 
                  'operator_name', 'operator_contact', 'captain_name', 'captain_license',

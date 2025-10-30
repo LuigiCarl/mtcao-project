@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api';
 
 export const apiClient = {
   async get(endpoint: string) {
@@ -11,11 +11,24 @@ export const apiClient = {
       credentials: 'include',
     });
 
+    // If the response is not OK, try to parse JSON error body safely
+    const contentType = response.headers.get('content-type') || '';
     if (!response.ok) {
-      throw new Error(`API Error: ${response.statusText}`);
+      if (contentType.includes('application/json')) {
+        const err = await response.json();
+        throw new Error(err.message || `API Error: ${response.status} ${response.statusText}`);
+      }
+      const text = await response.text();
+      throw new Error(`API Error: ${response.status} ${response.statusText} - Non-JSON response: ${text.slice(0,200)}`);
     }
 
-    return response.json();
+    // Successful response: ensure it's JSON before parsing
+    if (contentType.includes('application/json')) {
+      return response.json();
+    }
+
+    const text = await response.text();
+    throw new Error(`API returned non-JSON success response: ${text.slice(0,200)}`);
   },
 
   async post(endpoint: string, data: any) {
@@ -29,12 +42,22 @@ export const apiClient = {
       body: JSON.stringify(data),
     });
 
+    const contentType = response.headers.get('content-type') || '';
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || `API Error: ${response.statusText}`);
+      if (contentType.includes('application/json')) {
+        const error = await response.json();
+        throw new Error(error.message || `API Error: ${response.status} ${response.statusText}`);
+      }
+      const text = await response.text();
+      throw new Error(`API Error: ${response.status} ${response.statusText} - Non-JSON response: ${text.slice(0,200)}`);
     }
 
-    return response.json();
+    if (contentType.includes('application/json')) {
+      return response.json();
+    }
+
+    const text = await response.text();
+    throw new Error(`API returned non-JSON success response: ${text.slice(0,200)}`);
   },
 
   async put(endpoint: string, data: any) {
@@ -48,12 +71,22 @@ export const apiClient = {
       body: JSON.stringify(data),
     });
 
+    const contentType = response.headers.get('content-type') || '';
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || `API Error: ${response.statusText}`);
+      if (contentType.includes('application/json')) {
+        const error = await response.json();
+        throw new Error(error.message || `API Error: ${response.status} ${response.statusText}`);
+      }
+      const text = await response.text();
+      throw new Error(`API Error: ${response.status} ${response.statusText} - Non-JSON response: ${text.slice(0,200)}`);
     }
 
-    return response.json();
+    if (contentType.includes('application/json')) {
+      return response.json();
+    }
+
+    const text = await response.text();
+    throw new Error(`API returned non-JSON success response: ${text.slice(0,200)}`);
   },
 
   async delete(endpoint: string) {
@@ -66,11 +99,21 @@ export const apiClient = {
       credentials: 'include',
     });
 
+    const contentType = response.headers.get('content-type') || '';
     if (!response.ok) {
-      throw new Error(`API Error: ${response.statusText}`);
+      if (contentType.includes('application/json')) {
+        const err = await response.json();
+        throw new Error(err.message || `API Error: ${response.status} ${response.statusText}`);
+      }
+      const text = await response.text();
+      throw new Error(`API Error: ${response.status} ${response.statusText} - Non-JSON response: ${text.slice(0,200)}`);
     }
 
-    return response.json();
+    if (contentType.includes('application/json')) {
+      return response.json();
+    }
+
+    return { success: true };
   },
 };
 

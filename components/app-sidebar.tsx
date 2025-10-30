@@ -9,12 +9,10 @@ import {
   Settings,
   Info,
   BarChart3,
-  Users,
-  Ship,
 } from "lucide-react"
 
-import { SearchForm } from "@/components/search-form"
 import { VersionSwitcher } from "@/components/version-switcher"
+import { SearchForm } from "@/components/search-form"
 import { ModeToggle } from "@/components/mode-toggle"
 import {
   Sidebar,
@@ -47,17 +45,6 @@ const data = {
           title: "Forms",
           url: "/forms",
           icon: FileText,
-        },
-      ],
-    },
-    {
-      title: "Management",
-      url: "#",
-      items: [
-        {
-          title: "Boat Management",
-          url: "/boats",
-          icon: Ship,
         },
       ],
     },

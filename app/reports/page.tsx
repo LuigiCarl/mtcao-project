@@ -24,14 +24,14 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs"
-import { Users, Ship } from "lucide-react"
+import { Users, Sailboat } from "lucide-react"
 
 export default function ReportsPage() {
   return (
     <SidebarProvider>
       <AppSidebar />
-      <SidebarInset>
-        <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
+      <SidebarInset className="overflow-x-hidden">
+        <header className="flex h-16 shrink-0 items-center gap-1 sm:gap-2 border-b px-2 sm:px-4 overflow-x-hidden">
           <SidebarTrigger className="-ml-1" />
           <Separator
             orientation="vertical"
@@ -70,7 +70,7 @@ export default function ReportsPage() {
                 <span className="xs:hidden">Tourists</span>
               </TabsTrigger>
               <TabsTrigger value="boats" className="flex items-center gap-2 text-xs sm:text-sm">
-                <Ship className="h-3 w-3 sm:h-4 sm:w-4" />
+                <Sailboat className="h-3 w-3 sm:h-4 sm:w-4" />
                 <span className="hidden xs:inline">Boat Trips</span>
                 <span className="xs:hidden">Boats</span>
               </TabsTrigger>

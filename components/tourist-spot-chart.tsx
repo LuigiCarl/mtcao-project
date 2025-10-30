@@ -43,29 +43,18 @@ interface TouristSpotChartProps {
 export function TouristSpotChart({ data }: TouristSpotChartProps) {
   // Transform API data or use fallback
   const colorMap: Record<string, string> = {
-    'juag lagoon': 'hsl(199, 89%, 48%)',
-    'cave': 'hsl(30, 80%, 55%)',
-    'beach': 'hsl(45, 93%, 58%)',
-    'diving spot': 'hsl(280, 65%, 60%)',
-    'island tour': 'hsl(142, 76%, 36%)',
+    'Juag Lagoon': 'hsl(199, 89%, 48%)',
+    'Cave': 'hsl(30, 80%, 55%)',
+    'Beach': 'hsl(45, 93%, 58%)',
+    'Diving Spot': 'hsl(280, 65%, 60%)',
+    'Island Tour': 'hsl(142, 76%, 36%)',
   }
-
-  const toTitleCase = (s: string) =>
-    s
-      .split(' ')
-      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-      .join(' ')
-
-  const chartData = data?.map((item: any) => {
-    const raw = item.destination || item.spot || ''
-    const display = raw.replace(/_/g, ' ')
-    const key = display.trim().toLowerCase()
-    return {
-      spot: toTitleCase(display),
-      visitors: item.visitors || item.count || 0,
-      fill: colorMap[key] || 'hsl(0, 0%, 50%)',
-    }
-  }) || [
+  
+  const chartData = data?.map((item: any) => ({
+    spot: item.destination || item.spot,
+    visitors: item.visitors || item.count || 0,
+    fill: colorMap[item.destination || item.spot] || 'hsl(0, 0%, 50%)',
+  })) || [
     { spot: "Beach", visitors: 1620, fill: "hsl(45, 93%, 58%)" },
     { spot: "Juag Lagoon", visitors: 1450, fill: "hsl(199, 89%, 48%)" },
     { spot: "Cave", visitors: 980, fill: "hsl(30, 80%, 55%)" },
