@@ -17,9 +17,10 @@ interface ExportableChartProps {
   children: React.ReactNode
   chartId: string
   chartName: string
+  className?: string
 }
 
-export function ExportableChart({ children, chartId, chartName }: ExportableChartProps) {
+export function ExportableChart({ children, chartId, chartName, className }: ExportableChartProps) {
   const handleExportPNG = () => {
     exportChartAsImage(chartId, chartName)
   }
@@ -29,7 +30,8 @@ export function ExportableChart({ children, chartId, chartName }: ExportableChar
   }
 
   return (
-    <div className="relative h-full">
+  // wrapper accepts className (e.g. fixed height) so charts can be uniform
+  <div className={"relative " + (className || "")}>
       <div className="absolute right-4 top-4 z-10">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -52,7 +54,7 @@ export function ExportableChart({ children, chartId, chartName }: ExportableChar
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      <div id={chartId} className="h-full">
+      <div id={chartId} className={"w-full h-full"}>
         {children}
       </div>
     </div>

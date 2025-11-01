@@ -22,12 +22,12 @@ import {
 
 const chartConfig = {
   trips: {
-    label: "Trips",
-    color: "hsl(142, 76%, 36%)",
+    label: "🚤 Trips",
+    color: "hsl(217, 91%, 60%)",
   },
   passengers: {
-    label: "Passengers",
-    color: "hsl(221, 83%, 53%)",
+    label: "👥 Passengers",
+    color: "hsl(142, 76%, 36%)",
   },
 } satisfies ChartConfig
 
@@ -58,24 +58,36 @@ export function BoatTripTrendChart({ data }: BoatTripTrendChartProps) {
     : "January - June 2024"
 
   return (
-    <Card className="flex flex-col h-full min-h-[500px]">
+    <Card className="h-full">
       <CardHeader>
         <CardTitle>Boat Trip Trends</CardTitle>
         <CardDescription>{dateRange}</CardDescription>
       </CardHeader>
-      <CardContent className="flex-1">
-        <ChartContainer config={chartConfig} className="h-full w-full min-h-[300px] aspect-auto">
-          <LineChart
-            accessibilityLayer
-            data={chartData}
-            margin={{
-              left: 12,
-              right: 12,
-              top: 20,
-            }}
-            width={undefined}
-            height={undefined}
-          >
+      <CardContent className="flex flex-col h-full">
+        {/* Color Legend with Indicators */}
+        <div className="flex gap-6 text-xs mb-4 pb-4 border-b">
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 rounded" style={{ backgroundColor: 'hsl(217, 91%, 60%)' }} />
+            <span>🚤 Trips</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 rounded" style={{ backgroundColor: 'hsl(142, 76%, 36%)' }} />
+            <span>👥 Passengers</span>
+          </div>
+        </div>
+        <div className="flex-1 flex items-center justify-center">
+          <ChartContainer config={chartConfig} className="h-[240px] w-full">
+            <LineChart
+              accessibilityLayer
+              data={chartData}
+              margin={{
+                left: 12,
+                right: 12,
+                top: 20,
+              }}
+              width={undefined}
+              height={undefined}
+            >
             <CartesianGrid vertical={false} />
             <XAxis
               dataKey="month"
@@ -101,6 +113,7 @@ export function BoatTripTrendChart({ data }: BoatTripTrendChartProps) {
               strokeWidth={2}
               dot={{
                 fill: "var(--color-trips)",
+                r: 4,
               }}
               activeDot={{
                 r: 6,
@@ -109,7 +122,7 @@ export function BoatTripTrendChart({ data }: BoatTripTrendChartProps) {
               <LabelList
                 dataKey="trips"
                 position="top"
-                className="fill-foreground"
+                className="fill-foreground font-semibold"
                 fontSize={10}
               />
             </Line>
@@ -120,6 +133,7 @@ export function BoatTripTrendChart({ data }: BoatTripTrendChartProps) {
               strokeWidth={2}
               dot={{
                 fill: "var(--color-passengers)",
+                r: 4,
               }}
               activeDot={{
                 r: 6,
@@ -128,12 +142,13 @@ export function BoatTripTrendChart({ data }: BoatTripTrendChartProps) {
               <LabelList
                 dataKey="passengers"
                 position="bottom"
-                className="fill-foreground"
+                className="fill-foreground font-semibold"
                 fontSize={10}
               />
             </Line>
           </LineChart>
-        </ChartContainer>
+          </ChartContainer>
+        </div>
       </CardContent>
       <CardFooter className="flex-col items-start gap-2 text-sm">
         <div className="flex gap-2 font-medium leading-none">

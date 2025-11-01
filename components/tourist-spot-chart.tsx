@@ -1,7 +1,7 @@
 "use client"
 
 import { TrendingUp } from "lucide-react"
-import { Bar, BarChart, CartesianGrid, LabelList, XAxis, YAxis } from "recharts"
+import { Bar, BarChart, XAxis, YAxis } from "recharts"
 
 import {
   Card,
@@ -11,6 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import { Skeleton } from "@/components/ui/skeleton"
 import {
   ChartConfig,
   ChartContainer,
@@ -18,105 +19,106 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart"
 
+export const description = "Popular tourist spots (vertical layout)"
+
+interface SpotItem {
+  destination?: string
+  spot?: string
+  visitors?: number
+  count?: number
+}
+
+interface TouristSpotChartProps {
+  data?: SpotItem[]
+  loading?: boolean
+}
+
 const chartConfig = {
   visitors: {
-    label: "Visitors",
-  },
-  juagLagoon: {
-    label: "Juag Lagoon",
-    color: "hsl(199, 89%, 48%)",
-  },
-  cave: {
-    label: "Cave",
-    color: "hsl(30, 80%, 55%)",
-  },
-  beach: {
-    label: "Beach",
-    color: "hsl(45, 93%, 58%)",
+    label: "📍 Visitors",
   },
 } satisfies ChartConfig
 
-interface TouristSpotChartProps {
-  data?: any[]
-}
-
-export function TouristSpotChart({ data }: TouristSpotChartProps) {
-  // Transform API data or use fallback
-  const colorMap: Record<string, string> = {
-    'Juag Lagoon': 'hsl(199, 89%, 48%)',
-    'Cave': 'hsl(30, 80%, 55%)',
-    'Beach': 'hsl(45, 93%, 58%)',
-    'Diving Spot': 'hsl(280, 65%, 60%)',
-    'Island Tour': 'hsl(142, 76%, 36%)',
+export default function TouristSpotChart({ data, loading = false }: TouristSpotChartProps) {
+  // Loading skeleton
+  if (loading) {
+    return (
+      <Card>
+        <CardHeader>
+          <Skeleton className="h-6 w-44" />
+          <Skeleton className="h-4 w-64 mt-2" />
+        </CardHeader>
+        <CardContent>
+          <div className="h-[340px] w-full">
+            <Skeleton className="h-full w-full" />
+          </div>
+        </CardContent>
+        <CardFooter className="flex-col items-start gap-2 text-sm">
+          <Skeleton className="h-4 w-56" />
+        </CardFooter>
+      </Card>
+    )
   }
-  
-  const chartData = data?.map((item: any) => ({
-    spot: item.destination || item.spot,
-    visitors: item.visitors || item.count || 0,
-    fill: colorMap[item.destination || item.spot] || 'hsl(0, 0%, 50%)',
-  })) || [
-    { spot: "Beach", visitors: 1620, fill: "hsl(45, 93%, 58%)" },
-    { spot: "Juag Lagoon", visitors: 1450, fill: "hsl(199, 89%, 48%)" },
-    { spot: "Cave", visitors: 980, fill: "hsl(30, 80%, 55%)" },
-  ]
 
-  const totalVisitors = chartData.reduce((acc, curr) => acc + curr.visitors, 0)
-  const mostPopular = chartData.length > 0 
-    ? chartData.reduce((max, curr) => curr.visitors > max.visitors ? curr : max)
-    : null
+  const rows = (data || []).map((d) => ({
+    spot: d.destination || d.spot || "Unknown",
+    visitors: d.visitors ?? d.count ?? 0,
+  }))
+
+  const chartData = rows
+    .slice()
+    .sort((a, b) => b.visitors - a.visitors)
+
+  const totalVisitors = chartData.reduce((s, r) => s + r.visitors, 0)
+  const mostPopular = chartData[0] ?? null
 
   return (
-    <Card className="flex flex-col h-full min-h-[500px]">
+    <Card>
       <CardHeader>
         <CardTitle>Popular Tourist Spots</CardTitle>
-        <CardDescription>Most visited destinations this month</CardDescription>
+        <CardDescription>Most visited destinations</CardDescription>
       </CardHeader>
-      <CardContent className="flex-1">
-        <ChartContainer config={chartConfig} className="h-full w-full min-h-[300px] aspect-auto">
-          <BarChart accessibilityLayer data={chartData} width={undefined} height={undefined}>
-            <CartesianGrid vertical={false} />
-            <XAxis
+      <CardContent>
+        {/* Color Indicator */}
+        <div className="flex items-center gap-2 text-xs mb-4 pb-4 border-b">
+          <div className="w-3 h-3 rounded" style={{ backgroundColor: 'var(--chart-1)' }} />
+          <span>📍 Popular Tourist Spots - Visitor Count</span>
+        </div>
+        <ChartContainer config={chartConfig} className="h-[340px] w-full">
+          <BarChart
+            accessibilityLayer
+            data={chartData}
+            layout="vertical"
+            margin={{ left: 0 }}
+          >
+            <YAxis
               dataKey="spot"
+              type="category"
               tickLine={false}
               tickMargin={10}
               axisLine={false}
-              tickFormatter={(value) => value}
+              tickFormatter={(value) =>
+                (chartConfig as any)[value as keyof typeof chartConfig]?.label || String(value)
+              }
             />
-            <YAxis
-              tickLine={false}
-              axisLine={false}
-              tickMargin={8}
-            />
-            <ChartTooltip
-              cursor={false}
-              content={<ChartTooltipContent hideLabel />}
-            />
-            <Bar
-              dataKey="visitors"
-              radius={8}
-              fill="var(--color-visitors)"
-            >
-              <LabelList
-                dataKey="visitors"
-                position="top"
-                className="fill-foreground"
-                fontSize={12}
-              />
-            </Bar>
+            <XAxis dataKey="visitors" type="number" hide />
+            <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
+            <Bar dataKey="visitors" layout="vertical" radius={5} fill="var(--chart-1)" />
           </BarChart>
         </ChartContainer>
+        
       </CardContent>
       <CardFooter className="flex-col items-start gap-2 text-sm">
-        <div className="flex gap-2 font-medium leading-none">
+        <div className="flex gap-2 leading-none font-medium">
           {mostPopular ? (
-            <>{mostPopular.spot} is most popular <TrendingUp className="h-4 w-4" /></>
+            <>
+              {mostPopular.spot} is most popular <TrendingUp className="h-4 w-4" />
+            </>
           ) : (
-            <>No data available for selected period</>
+            <>No data available</>
           )}
         </div>
-        <div className="leading-none text-muted-foreground">
-          Total spot visits: {totalVisitors.toLocaleString()} visitors
-        </div>
+        <div className="text-muted-foreground leading-none">Total visitors: {totalVisitors.toLocaleString()}</div>
       </CardFooter>
     </Card>
   )

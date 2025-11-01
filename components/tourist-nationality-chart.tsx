@@ -20,12 +20,12 @@ import {
 
 const chartConfig = {
   foreign: {
-    label: "Foreign",
-    color: "hsl(142, 76%, 36%)",
+    label: "🌍 Foreign",
+    color: "hsl(0, 84%, 60%)",
   },
   domestic: {
-    label: "Domestic",
-    color: "hsl(142, 71%, 45%)",
+    label: "🏠 Domestic",
+    color: "hsl(142, 76%, 36%)",
   },
 } satisfies ChartConfig
 
@@ -49,14 +49,26 @@ export function TouristNationalityChart({ data }: TouristNationalityChartProps) 
   ]
 
   return (
-    <Card className="flex flex-col h-full min-h-[500px]">
+    <Card className="h-full">
       <CardHeader>
         <CardTitle>Tourist by Nationality</CardTitle>
         <CardDescription>Foreign vs Domestic breakdown</CardDescription>
       </CardHeader>
-      <CardContent className="flex-1">
-        <ChartContainer config={chartConfig} className="h-full w-full min-h-[300px] aspect-auto">
-          <BarChart accessibilityLayer data={chartData} width={undefined} height={undefined}>
+      <CardContent className="flex flex-col h-full">
+        {/* Color Legend with Indicators */}
+        <div className="flex gap-6 text-xs mb-4 pb-4 border-b">
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 rounded" style={{ backgroundColor: 'hsl(0, 84%, 60%)' }} />
+            <span>🌍 Foreign Tourists</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 rounded" style={{ backgroundColor: 'hsl(142, 76%, 36%)' }} />
+            <span>🏠 Domestic Tourists</span>
+          </div>
+        </div>
+        <div className="flex-1 flex items-center justify-center">
+          <ChartContainer config={chartConfig} className="h-[240px] w-full">
+            <BarChart accessibilityLayer data={chartData} width={undefined} height={undefined}>
             <CartesianGrid vertical={false} />
             <XAxis
               dataKey="nationality"
@@ -78,7 +90,7 @@ export function TouristNationalityChart({ data }: TouristNationalityChartProps) 
               <LabelList
                 dataKey="foreign"
                 position="top"
-                className="fill-foreground"
+                className="fill-foreground font-semibold"
                 fontSize={10}
               />
             </Bar>
@@ -86,12 +98,13 @@ export function TouristNationalityChart({ data }: TouristNationalityChartProps) 
               <LabelList
                 dataKey="domestic"
                 position="top"
-                className="fill-foreground"
+                className="fill-foreground font-semibold"
                 fontSize={10}
               />
             </Bar>
           </BarChart>
-        </ChartContainer>
+          </ChartContainer>
+        </div>
       </CardContent>
       <CardFooter className="flex-col items-start gap-2 text-sm">
         <div className="flex gap-2 font-medium leading-none">

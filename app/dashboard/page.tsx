@@ -9,7 +9,7 @@ import { TouristNationalityChart } from "@/components/tourist-nationality-chart"
 import { PurposeOfVisitChart } from "@/components/purpose-of-visit-chart"
 import { BoatTripTrendChart } from "@/components/boat-trip-trend-chart"
 import { AccommodationTypeChart } from "@/components/accommodation-type-chart"
-import { TouristSpotChart } from "@/components/tourist-spot-chart"
+import TouristSpotChart from "@/components/tourist-spot-chart"
 import { ExportableChart } from "@/components/exportable-chart"
 import { ModeToggle } from "@/components/mode-toggle"
 import {
@@ -137,6 +137,13 @@ export default function Page() {
               </button>
             </div>
           )}
+          {/* Development-only: show raw stats payload for debugging chart data */}
+          {process.env.NODE_ENV !== "production" && stats && (
+            <details className="rounded-md border p-2 bg-muted/30 mb-2">
+              <summary className="text-xs text-muted-foreground">Debug: Raw stats payload (click to expand)</summary>
+              <pre className="mt-2 max-h-60 overflow-auto text-[11px]">{JSON.stringify(stats, null, 2)}</pre>
+            </details>
+          )}
           
           {loading ? (
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -218,17 +225,18 @@ export default function Page() {
               </div>
 
               {/* Charts Grid - 2x2 plus 1 full width */}
-              <div className="grid gap-3 sm:gap-4 grid-cols-1 lg:grid-cols-2 auto-rows-fr">
-                <ExportableChart chartId="nationality-chart" chartName="Tourist_Nationality">
+              {/* removed auto-rows-fr to prevent rows from stretching to fill available height */}
+              <div className="grid gap-3 sm:gap-4 grid-cols-1 lg:grid-cols-2">
+                <ExportableChart className="h-[400px]" chartId="nationality-chart" chartName="Tourist_Nationality">
                   <TouristNationalityChart data={stats?.nationality_stats} />
                 </ExportableChart>
-                <ExportableChart chartId="purpose-chart" chartName="Purpose_of_Visit">
+                <ExportableChart className="h-[400px]" chartId="purpose-chart" chartName="Purpose_of_Visit">
                   <PurposeOfVisitChart data={stats?.purpose_stats} />
                 </ExportableChart>
-                <ExportableChart chartId="accommodation-chart" chartName="Accommodation_Type">
+                <ExportableChart className="h-[400px]" chartId="accommodation-chart" chartName="Accommodation_Type">
                   <AccommodationTypeChart data={stats?.accommodation_stats} />
                 </ExportableChart>
-                <ExportableChart chartId="boat-trend-chart" chartName="Boat_Trip_Trends">
+                <ExportableChart className="h-[400px]" chartId="boat-trend-chart" chartName="Boat_Trip_Trends">
                   <BoatTripTrendChart data={stats?.trip_trends} />
                 </ExportableChart>
               </div>

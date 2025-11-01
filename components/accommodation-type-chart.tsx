@@ -1,7 +1,7 @@
 "use client"
 
 import { TrendingUp } from "lucide-react"
-import { Bar, BarChart, CartesianGrid, LabelList, XAxis, YAxis } from "recharts"
+import { Bar, BarChart, CartesianGrid, LabelList, XAxis, YAxis, Legend, ResponsiveContainer } from "recharts"
 
 import {
   Card,
@@ -23,16 +23,16 @@ const chartConfig = {
     label: "Visitors",
   },
   dayTour: {
-    label: "Day Tour",
-    color: "hsl(142, 76%, 36%)",
+    label: "🌅 Day Tour",
+    color: "hsl(38, 92%, 50%)",
   },
   overnight: {
-    label: "Overnight",
-    color: "hsl(221, 83%, 53%)",
+    label: "🌙 Overnight",
+    color: "hsl(217, 91%, 60%)",
   },
   staycation: {
-    label: "Staycation",
-    color: "hsl(280, 65%, 60%)",
+    label: "🏠 Staycation",
+    color: "hsl(142, 76%, 36%)",
   },
 } satisfies ChartConfig
 
@@ -48,9 +48,9 @@ export function AccommodationTypeChart({ data }: AccommodationTypeChartProps) {
     ).join(' ') || 'Unknown'
     
     const colorMap: Record<string, string> = {
-      'Day Tour': 'hsl(142, 76%, 36%)',
-      'Overnight': 'hsl(221, 83%, 53%)',
-      'Staycation': 'hsl(280, 65%, 60%)',
+      'Day Tour': 'hsl(38, 92%, 50%)',
+      'Overnight': 'hsl(217, 91%, 60%)',
+      'Staycation': 'hsl(142, 76%, 36%)',
     }
     
     return {
@@ -67,14 +67,31 @@ export function AccommodationTypeChart({ data }: AccommodationTypeChartProps) {
   const totalVisitors = chartData.reduce((acc, curr) => acc + curr.visitors, 0)
 
   return (
-    <Card className="flex flex-col h-full min-h-[500px]">
+    <Card className="h-full">
       <CardHeader>
         <CardTitle>Accommodation Type</CardTitle>
         <CardDescription>Tourist accommodation preferences</CardDescription>
       </CardHeader>
-      <CardContent className="flex-1">
-        <ChartContainer config={chartConfig} className="h-full w-full min-h-[300px] aspect-auto">
-          <BarChart accessibilityLayer data={chartData} width={undefined} height={undefined}>
+      <CardContent className="flex flex-col h-full">
+        <div className="flex flex-col gap-4 h-full">
+          {/* Color Legend */}
+          <div className="flex flex-wrap gap-4 text-xs mb-2">
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded" style={{ backgroundColor: 'hsl(38, 92%, 50%)' }} />
+              <span>🌅 Day Tour</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded" style={{ backgroundColor: 'hsl(217, 91%, 60%)' }} />
+              <span>🌙 Overnight</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded" style={{ backgroundColor: 'hsl(142, 76%, 36%)' }} />
+              <span>🏠 Staycation</span>
+            </div>
+          </div>
+          <div className="flex-1 flex items-center justify-center">
+            <ChartContainer config={chartConfig} className="h-[240px] w-full">
+              <BarChart accessibilityLayer data={chartData} width={undefined} height={undefined}>
             <CartesianGrid vertical={false} />
             <XAxis
               dataKey="type"
@@ -100,12 +117,14 @@ export function AccommodationTypeChart({ data }: AccommodationTypeChartProps) {
               <LabelList
                 dataKey="visitors"
                 position="top"
-                className="fill-foreground"
+                className="fill-foreground font-semibold"
                 fontSize={12}
               />
             </Bar>
           </BarChart>
         </ChartContainer>
+          </div>
+        </div>
       </CardContent>
       <CardFooter className="flex-col items-start gap-2 text-sm">
         <div className="flex gap-2 font-medium leading-none">
