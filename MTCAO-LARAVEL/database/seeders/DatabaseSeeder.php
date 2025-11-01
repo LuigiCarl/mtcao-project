@@ -68,7 +68,11 @@ class DatabaseSeeder extends Seeder
         ];
 
         foreach ($boats as $boatData) {
-            Boat::create($boatData);
+            // Ensure boats are not duplicated on re-seed
+            Boat::updateOrCreate(
+                ['registration_number' => $boatData['registration_number']],
+                $boatData
+            );
         }
 
         // Create sample tourists
@@ -111,11 +115,15 @@ class DatabaseSeeder extends Seeder
             ]);
         }
 
-        // Create test user
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        // Create test user (avoid duplicate on re-seed)
+        User::firstOrCreate(
+            ['email' => 'test@example.com'],
+            [
+                'name' => 'Test User',
+                'email' => 'test@example.com',
+                'password' => bcrypt('password'),
+            ]
+        );
     }
 }
 
